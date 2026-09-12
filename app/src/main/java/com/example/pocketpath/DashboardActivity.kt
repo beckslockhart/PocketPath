@@ -3,31 +3,19 @@ package com.example.pocketpath
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.widget.ProgressBar
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.pocketpath.data.database.PocketPathDatabase
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
 
 class DashboardActivity : AppCompatActivity() {
 
     private lateinit var database: PocketPathDatabase
-
     private lateinit var tvWelcome: TextView
-    private lateinit var tvTotalSpent: TextView
-    private lateinit var tvMinimumGoal: TextView
-    private lateinit var tvMaximumGoal: TextView
-    private lateinit var tvBudgetStatus: TextView
-    private lateinit var tvRecentExpenses: TextView
-    private lateinit var progressMonthlyBudget: ProgressBar
 
-    private var currentUserId: Long = -1
+    private var currentUserId: Long = -1L
 
     companion object {
         private const val TAG = "PocketPathDashboard"
@@ -44,29 +32,37 @@ class DashboardActivity : AppCompatActivity() {
         currentUserId = getSharedPreferences(
             PREFERENCES_NAME,
             MODE_PRIVATE
-        ).getLong(KEY_USER_ID, -1)
+        ).getLong(KEY_USER_ID, -1L)
 
         if (currentUserId == -1L) {
             returnToLogin()
             return
         }
 
-        connectViews()
-        configureButtons()
+        tvWelcome = findViewById(R.id.tvWelcome)
+
         loadUserDetails()
-        loadMonthlySpending()
-        loadRecentExpenses()
+        configureButtons()
     }
 
-    private fun connectViews() {
-        tvWelcome = findViewById(R.id.tvWelcome)
-        tvTotalSpent = findViewById(R.id.tvTotalSpent)
-        tvMinimumGoal = findViewById(R.id.tvMinimumGoal)
-        tvMaximumGoal = findViewById(R.id.tvMaximumGoal)
-        tvBudgetStatus = findViewById(R.id.tvBudgetStatus)
-        tvRecentExpenses = findViewById(R.id.tvRecentExpenses)
-        progressMonthlyBudget = findViewById(R.id.progressMonthlyBudget)
+    private fun loadUserDetails() {
+        lifecycleScope.launch {
+            try {
+                val user = database.userDao().getUserById(currentUserId)
 
+                if (user != null) {
+                    tvWelcome.text = "Hello, ${user.username}!"
+                    Log.d(TAG, "Dashboard loaded for user ID: $currentUserId")
+                } else {
+                    returnToLogin()
+                }
+            } catch (exception: Exception) {
+                Log.e(TAG, "Unable to load user details", exception)
+            }
+        }
+    }
+
+    private fun configureButtons() {
         val btnAddExpense =
             findViewById<MaterialButton>(R.id.btnAddExpense)
 
@@ -83,19 +79,27 @@ class DashboardActivity : AppCompatActivity() {
             findViewById<MaterialButton>(R.id.btnLogout)
 
         btnAddExpense.setOnClickListener {
-            showFeatureMessage("Add Expense")
+            startActivity(
+                Intent(this, AddExpensesActivity::class.java)
+            )
         }
 
         btnExpenseHistory.setOnClickListener {
-            showFeatureMessage("Expense History")
+            startActivity(
+                Intent(this, ExpenseHistoryActivity::class.java)
+            )
         }
 
         btnCategories.setOnClickListener {
-            showFeatureMessage("Budget Categories")
+            startActivity(
+                Intent(this, CategoriesActivity::class.java)
+            )
         }
 
         btnMonthlyGoals.setOnClickListener {
-            showFeatureMessage("Monthly Goals")
+            startActivity(
+                Intent(this, MonthlyGoalsActivity::class.java)
+            )
         }
 
         btnLogout.setOnClickListener {
@@ -103,114 +107,13 @@ class DashboardActivity : AppCompatActivity() {
         }
     }
 
-    private fun configureButtons() {
-        Log.d(TAG, "Dashboard controls configured")
-    }
-
-    private fun loadUserDetails() {
-        lifecycleScope.launch {
-            try {
-                val user = database.userDao().getUserById(currentUserId)
-
-                if (user != null) {
-                    tvWelcome.text = "Hello, ${user.username}!"
-                    Log.d(TAG, "Dashboard loaded for user ID: $currentUserId")
-                } else {
-                    logout()
-                }
-            } catch (exception: Exception) {
-                Log.e(TAG, "Unable to load user details", exception)
-                Toast.makeText(
-                    this@DashboardActivity,
-                    "Unable to load user details",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
-    }
-
-    private fun loadMonthlySpending() {
-        val calendar = Calendar.getInstance()
-
-        calendar.set(Calendar.DAY_OF_MONTH, 1)
-        calendar.set(Calendar.HOUR_OF_DAY, 0)
-        calendar.set(Calendar.MINUTE, 0)
-        calendar.set(Calendar.SECOND, 0)
-        calendar.set(Calendar.MILLISECOND, 0)
-        val startOfMonth = calendar.timeInMillis
-
-        calendar.add(Calendar.MONTH, 1)
-        calendar.add(Calendar.MILLISECOND, -1)
-        val endOfMonth = calendar.timeInMillis
-
-        lifecycleScope.launch {
-            database.expenseDao()
-                .getTotalSpentForPeriod(
-                    currentUserId,
-                    startOfMonth,
-                    endOfMonth
-                )
-                .collect { totalSpent ->
-                    tvTotalSpent.text = formatCurrency(totalSpent)
-
-                    if (totalSpent == 0.0) {
-                        tvBudgetStatus.text =
-                            "No expenses recorded this month"
-                        progressMonthlyBudget.progress = 0
-                    }
-                }
-        }
-    }
-
-    private fun loadRecentExpenses() {
-        lifecycleScope.launch {
-            database.expenseDao()
-                .getAllExpensesForUser(currentUserId)
-                .collect { expenses ->
-                    val recentExpenses = expenses.take(3)
-
-                    if (recentExpenses.isEmpty()) {
-                        tvRecentExpenses.text =
-                            "No expenses recorded yet"
-                    } else {
-                        val dateFormatter =
-                            SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
-
-                        tvRecentExpenses.text = recentExpenses.joinToString(
-                            separator = "\n\n"
-                        ) { expense ->
-                            val date =
-                                dateFormatter.format(expense.expenseDate)
-
-                            "${expense.description}\n" +
-                                    "$date  •  ${formatCurrency(expense.amount)}"
-                        }
-                    }
-                }
-        }
-    }
-
-    private fun formatCurrency(amount: Double): String {
-        return String.format(
-            Locale.getDefault(),
-            "R%.2f",
-            amount
-        )
-    }
-
-    private fun showFeatureMessage(featureName: String) {
-        Toast.makeText(
-            this,
-            "$featureName screen will be connected next",
-            Toast.LENGTH_SHORT
-        ).show()
-    }
-
     private fun logout() {
         getSharedPreferences(
             PREFERENCES_NAME,
             MODE_PRIVATE
-        ).edit().remove(KEY_USER_ID).apply()
+        ).edit()
+            .remove(KEY_USER_ID)
+            .apply()
 
         Log.d(TAG, "User logged out")
         returnToLogin()
@@ -218,6 +121,11 @@ class DashboardActivity : AppCompatActivity() {
 
     private fun returnToLogin() {
         val intent = Intent(this, MainActivity::class.java)
+
+        intent.flags =
+            Intent.FLAG_ACTIVITY_NEW_TASK or
+                    Intent.FLAG_ACTIVITY_CLEAR_TASK
+
         startActivity(intent)
         finish()
     }
