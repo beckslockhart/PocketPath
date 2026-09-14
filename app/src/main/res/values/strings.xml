@@ -1,3 +1,26 @@
 <resources>
     <string name="app_name">PocketPath</string>
+    <string name="add_expense_back">←  Dashboard</string>
+    <string name="add_expense_title">Add expense</string>
+    <string name="add_expense_subtitle">Record your spending while the details are fresh.</string>
+    <string name="expense_details">Expense details</string>
+    <string name="amount">Amount</string>
+    <string name="currency_prefix" translatable="false">R </string>
+    <string name="category">Category</string>
+    <string name="description">Description</string>
+    <string name="date_and_time">Date and time</string>
+    <string name="date">Date</string>
+    <string name="choose_date">Choose date</string>
+    <string name="start_time">Start time</string>
+    <string name="choose_start_time">Choose start time</string>
+    <string name="end_time">End time</string>
+    <string name="choose_end_time">Choose end time</string>
+    <string name="receipt_photograph">Receipt photograph</string>
+    <string name="no_photograph_attached">No photograph attached</string>
+    <string name="photograph_attached">Photograph attached</string>
+    <string name="expense_photograph_preview">Expense photograph preview</string>
+    <string name="take_photo">Take photo</string>
+    <string name="remove">Remove</string>
+    <string name="save_expense">Save expense</string>
+    <string name="saving_expense">Saving…</string>
 </resources>
