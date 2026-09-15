@@ -173,11 +173,9 @@ class AddExpensesActivity : AppCompatActivity() {
                             categoryDropdown.setText("", false)
                         }
                         if (latestCategories.isEmpty()) {
-                            categoryDropdown.hint = "Create a category first"
                             categoryLayout.helperText =
                                 "Add a budget category from the dashboard before saving."
                         } else {
-                            categoryDropdown.hint = "Select category"
                             categoryLayout.helperText = null
                         }
                     }
