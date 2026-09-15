@@ -26,6 +26,7 @@ import com.example.pocketpath.util.PeriodFilter
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
@@ -195,6 +196,8 @@ class ExpenseHistoryActivity : AppCompatActivity() {
                     renderExpenses(expenses, categories)
                     renderCategoryTotals(totals)
                 }
+            } catch (cancellation: CancellationException) {
+                throw cancellation
             } catch (exception: Exception) {
                 Log.e(TAG, "Unable to load expense history", exception)
                 Toast.makeText(
