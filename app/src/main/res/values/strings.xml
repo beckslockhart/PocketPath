@@ -23,4 +23,23 @@
     <string name="remove">Remove</string>
     <string name="save_expense">Save expense</string>
     <string name="saving_expense">Saving…</string>
+
+    <string name="expense_history_title">Expense history</string>
+    <string name="expense_history_subtitle">Choose a period to see what you spent and where.</string>
+    <string name="selected_period">Selected period</string>
+    <string name="period_from">From</string>
+    <string name="period_to">To</string>
+    <string name="choose_period_start">Choose the start of the period</string>
+    <string name="choose_period_end">Choose the end of the period</string>
+    <string name="reset_to_this_month">Reset to this month</string>
+    <string name="spent_per_category">Spent per category</string>
+    <string name="no_expenses_in_period">No expenses were recorded in this period. Try widening the dates, or add an expense from the dashboard.</string>
+    <string name="no_category_totals">Nothing spent yet in this period.</string>
+    <string name="period_end_before_start">The end date cannot be before the start date</string>
+    <string name="uncategorised">Uncategorised</string>
+    <string name="view_photograph">View photograph</string>
+    <string name="close_photograph">✕  Close</string>
+    <string name="photograph_unavailable">This photograph is no longer available on the device.</string>
+    <string name="expense_date_time_format">%1$s  ·  %2$s – %3$s</string>
+    <string name="unable_to_load_expenses">Unable to load your expense history</string>
 </resources>

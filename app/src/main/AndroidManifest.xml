@@ -33,6 +33,9 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
+            android:name=".PhotoViewerActivity"
+            android:exported="false" />
+        <activity
             android:name=".CategoriesActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
