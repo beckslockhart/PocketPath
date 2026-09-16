@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!--
+    Add Expense screen.
+
+    Allows the user to enter expense information, select a category,
+    choose a date and time period, optionally attach a receipt photograph
+    and save the completed expense.
+-->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -15,6 +23,7 @@
         android:paddingEnd="20dp"
         android:paddingBottom="36dp">
 
+        <!-- Navigation back to the previous/dashboard screen. -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnBack"
             style="@style/Widget.Material3.Button.TextButton"
@@ -27,6 +36,7 @@
             android:textColor="#176B65"
             android:textSize="16sp" />
 
+        <!-- Main screen heading. -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -44,6 +54,10 @@
             android:textColor="#6A7F81"
             android:textSize="14sp" />
 
+        <!--
+            Expense details section.
+            Contains the required amount, category and description fields.
+        -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -67,6 +81,7 @@
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
+                <!-- Expense amount entered in South African Rand. -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/amountLayout"
                     style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
@@ -83,8 +98,10 @@
                         android:imeOptions="actionNext"
                         android:inputType="numberDecimal"
                         android:maxLength="12" />
+
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <!-- Dropdown containing the logged-in user's categories. -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/categoryLayout"
                     style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
@@ -102,8 +119,10 @@
                         android:importantForAutofill="no"
                         android:inputType="none"
                         android:singleLine="true" />
+
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <!-- Short explanation of what the expense was for. -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/descriptionLayout"
                     style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
@@ -123,10 +142,17 @@
                         android:maxLength="120"
                         android:maxLines="3"
                         android:minLines="2" />
+
                 </com.google.android.material.textfield.TextInputLayout>
+
             </LinearLayout>
+
         </com.google.android.material.card.MaterialCardView>
 
+        <!--
+            Date and time section.
+            Allows the user to record when the expense took place.
+        -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -150,6 +176,7 @@
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
+                <!-- Opens a DatePickerDialog when selected. -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/dateLayout"
                     style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
@@ -168,8 +195,10 @@
                         android:cursorVisible="false"
                         android:focusable="false"
                         android:inputType="none" />
+
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <!-- Start and end time fields are displayed side-by-side. -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -177,6 +206,7 @@
                     android:baselineAligned="false"
                     android:orientation="horizontal">
 
+                    <!-- Expense start time. -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/startTimeLayout"
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
@@ -196,8 +226,10 @@
                             android:cursorVisible="false"
                             android:focusable="false"
                             android:inputType="none" />
+
                     </com.google.android.material.textfield.TextInputLayout>
 
+                    <!-- Expense end time. -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/endTimeLayout"
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
@@ -217,11 +249,19 @@
                             android:cursorVisible="false"
                             android:focusable="false"
                             android:inputType="none" />
+
                     </com.google.android.material.textfield.TextInputLayout>
+
                 </LinearLayout>
+
             </LinearLayout>
+
         </com.google.android.material.card.MaterialCardView>
 
+        <!--
+            Optional receipt photograph section.
+            The user can capture, preview and remove a photograph.
+        -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -245,6 +285,7 @@
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
+                <!-- Informs the user whether a photograph is currently attached. -->
                 <TextView
                     android:id="@+id/photoStatus"
                     android:layout_width="wrap_content"
@@ -254,6 +295,7 @@
                     android:textColor="#6A7F81"
                     android:textSize="14sp" />
 
+                <!-- Hidden until a receipt photograph has been captured. -->
                 <ImageView
                     android:id="@+id/photoPreview"
                     android:layout_width="match_parent"
@@ -263,6 +305,7 @@
                     android:scaleType="centerCrop"
                     android:visibility="gone" />
 
+                <!-- Controls for capturing or removing the receipt photograph. -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -281,6 +324,7 @@
                         app:backgroundTint="#E5F2F0"
                         app:cornerRadius="13dp" />
 
+                    <!-- Only shown after a photograph has been attached. -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnRemovePhoto"
                         android:layout_width="wrap_content"
@@ -294,10 +338,17 @@
                         app:cornerRadius="13dp"
                         app:strokeColor="#D8A9A9"
                         app:strokeWidth="1dp" />
+
                 </LinearLayout>
+
             </LinearLayout>
+
         </com.google.android.material.card.MaterialCardView>
 
+        <!--
+            Final save button.
+            Kotlin validates all required information before saving to Room.
+        -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSaveExpense"
             android:layout_width="match_parent"
@@ -308,5 +359,7 @@
             android:textSize="16sp"
             app:backgroundTint="#176B65"
             app:cornerRadius="14dp" />
+
     </LinearLayout>
+
 </ScrollView>

@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!--
+    FileProvider path configuration for expense photographs.
+
+    Only the expense_photos folder inside PocketPath's private files
+    directory is exposed through FileProvider.
+-->
 <paths>
+
+    <!--
+        Allows receipt images stored in files/expense_photos/
+        to be securely shared with the device camera application.
+    -->
     <files-path
         name="expense_photos"
         path="expense_photos/" />
+
 </paths>

@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!--
+    Android application configuration for PocketPath.
+
+    Activities used throughout the app are registered here together
+    with the FileProvider required for securely capturing receipt photographs.
+-->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application
@@ -10,49 +17,82 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.PocketPath">
+
+        <!--
+            Main launcher activity.
+            This is the first screen Android opens when PocketPath starts.
+        -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustResize">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
+
+        <!-- Main dashboard shown after the user has logged in. -->
         <activity
             android:name=".DashboardActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
+        <!--
+            Add Expense screen.
+            Allows users to create and save expenses and attach receipt photographs.
+        -->
         <activity
             android:name=".AddExpensesActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
+        <!-- Displays previously saved expenses and filtering options. -->
         <activity
             android:name=".ExpenseHistoryActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
+        <!-- Displays an expense photograph in a dedicated viewer. -->
         <activity
             android:name=".PhotoViewerActivity"
             android:exported="false" />
+
+        <!-- Allows the user to create and manage expense categories. -->
         <activity
             android:name=".CategoriesActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
+        <!-- Allows the user to configure monthly spending goals. -->
         <activity
             android:name=".MonthlyGoalsActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
+        <!--
+            Secure FileProvider used by the Add Expense feature.
+
+            The camera application cannot be given direct access to PocketPath's
+            private files. FileProvider creates a temporary content URI that allows
+            the camera to save the receipt photograph safely.
+        -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
+
+            <!-- Defines which internal files can be shared through FileProvider. -->
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
+
         </provider>
+
     </application>
 
 </manifest>
