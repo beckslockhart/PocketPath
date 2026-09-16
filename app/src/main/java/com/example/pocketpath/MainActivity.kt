@@ -15,24 +15,35 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import kotlinx.coroutines.launch
 
+/**
+ * Handles user registration and login for PocketPath.
+ *
+ * User accounts are stored locally using RoomDB. After successful
+ * authentication, the active user's ID is stored for use by other screens.
+ */
 class MainActivity : AppCompatActivity() {
 
+    // Provides access to the local Room database and its DAO interfaces.
     private lateinit var database: PocketPathDatabase
 
+    // TextInputLayouts are used to display validation errors.
     private lateinit var usernameLayout: TextInputLayout
     private lateinit var passwordLayout: TextInputLayout
     private lateinit var confirmPasswordLayout: TextInputLayout
 
+    // Input fields containing the user's authentication details.
     private lateinit var etUsername: TextInputEditText
     private lateinit var etPassword: TextInputEditText
     private lateinit var etConfirmPassword: TextInputEditText
 
+    // Text displayed at the top of the authentication card.
     private lateinit var tvAuthTitle: TextView
     private lateinit var tvAuthSubtitle: TextView
 
     private lateinit var btnPrimaryAction: MaterialButton
     private lateinit var btnSwitchAuthMode: MaterialButton
 
+    // Determines whether the interface is currently registering or logging in.
     private var isRegisterMode = false
 
     companion object {
@@ -45,6 +56,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Retrieve the shared Room database instance.
         database = PocketPathDatabase.getDatabase(this)
 
         connectViews()
@@ -71,7 +83,9 @@ class MainActivity : AppCompatActivity() {
         btnSwitchAuthMode = findViewById(R.id.btnSwitchAuthMode)
     }
 
-
+    /**
+     * Configures the main authentication button and the mode-switch button.
+     */
     private fun configureButtons() {
         btnPrimaryAction.setOnClickListener {
             clearErrors()
@@ -89,7 +103,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
+    /**
+     * Updates the screen controls when switching between login and registration.
+     */
     private fun updateAuthMode() {
         if (isRegisterMode) {
             tvAuthTitle.text = "Create account"
@@ -106,10 +122,13 @@ class MainActivity : AppCompatActivity() {
             etConfirmPassword.text?.clear()
         }
 
+        // Remove validation messages left over from the previous mode.
         clearErrors()
     }
 
-
+    /**
+     * Validates and saves a new user account in the Room database.
+     */
     private fun registerUser() {
         val username = etUsername.text.toString().trim()
         val password = etPassword.text.toString()
@@ -119,10 +138,12 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        // Database operations run inside a coroutine to avoid blocking the UI.
         lifecycleScope.launch {
             try {
                 val existingUser = database.userDao().getUserByUsername(username)
 
+                // Usernames must be unique.
                 if (existingUser != null) {
                     usernameLayout.error = "This username is already registered"
                     return@launch
@@ -157,7 +178,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
+    /**
+     * Checks the entered details against the users stored in RoomDB.
+     */
     private fun loginUser() {
         val username = etUsername.text.toString().trim()
         val password = etPassword.text.toString()
@@ -192,6 +215,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Ensures that all registration fields contain acceptable information.
+     */
     private fun validateRegistration(
         username: String,
         password: String,
@@ -226,6 +252,9 @@ class MainActivity : AppCompatActivity() {
         return isValid
     }
 
+    /**
+     * Prevents a login attempt when required fields are empty.
+     */
     private fun validateLogin(
         username: String,
         password: String
@@ -245,13 +274,19 @@ class MainActivity : AppCompatActivity() {
         return isValid
     }
 
+    /**
+     * Clears any previous validation messages from the input fields.
+     */
     private fun clearErrors() {
         usernameLayout.error = null
         passwordLayout.error = null
         confirmPasswordLayout.error = null
     }
 
-
+    /**
+     * Stores the active user's ID so the other screens can retrieve
+     * information belonging to the correct user.
+     */
     private fun saveLoggedInUser(userId: Long) {
         getSharedPreferences(PREFERENCES_NAME, MODE_PRIVATE)
             .edit()
@@ -259,7 +294,9 @@ class MainActivity : AppCompatActivity() {
             .apply()
     }
 
-
+    /**
+     * Opens the Dashboard after successful registration or login.
+     */
     private fun openDashboard() {
         val intent = Intent(this, DashboardActivity::class.java)
         startActivity(intent)
