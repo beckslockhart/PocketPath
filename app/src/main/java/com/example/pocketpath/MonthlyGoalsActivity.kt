@@ -147,6 +147,7 @@ class MonthlyGoalsActivity : AppCompatActivity() {
         }
     }
 
+    /** Validates both amounts (must be positive, minimum ≤ maximum) before saving. */
     private fun saveGoals() {
         minimumLayout.error = null
         maximumLayout.error = null

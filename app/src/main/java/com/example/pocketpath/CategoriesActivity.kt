@@ -53,6 +53,7 @@ class CategoriesActivity : AppCompatActivity() {
         observeCategories()
     }
 
+    /** Combines the user's categories with this month's spending per category, live. */
     private fun observeCategories() {
         val (startOfMonth, endOfMonth) = monthRange()
         lifecycleScope.launch {
@@ -81,6 +82,7 @@ class CategoriesActivity : AppCompatActivity() {
         }
     }
 
+    /** Rebuilds the on-screen list of category cards to match the latest data. */
     private fun renderCategories(pairs: List<Pair<Category, Double>>) {
         categoriesContainer.removeAllViews()
         if (pairs.isEmpty()) {
@@ -103,6 +105,7 @@ class CategoriesActivity : AppCompatActivity() {
         }
     }
 
+    /** Fills in one category card's values and sets its progress bar colour based on spend ratio. */
     private fun bindCategoryCard(cardView: View, category: Category, spent: Double) {
         val tvName = cardView.findViewById<TextView>(R.id.tvCategoryName)
         val tvLimit = cardView.findViewById<TextView>(R.id.tvLimit)
@@ -134,6 +137,7 @@ class CategoriesActivity : AppCompatActivity() {
         btnDelete.setOnClickListener { confirmDelete(category) }
     }
 
+    /** Opens the add/edit popup. Pass null to add a new category, or an existing one to edit it. */
     private fun showCategoryDialog(existing: Category?) {
         val dialogView = LayoutInflater.from(this)
             .inflate(R.layout.dialog_add_category, null)

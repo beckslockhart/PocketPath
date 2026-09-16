@@ -90,6 +90,7 @@ class DashboardActivity : AppCompatActivity() {
         }
     }
 
+    /** Combines total spend this month with the saved goal, live, to drive the summary card. */
     private fun observeMonthlyOverview() {
         val (startOfMonth, endOfMonth) = monthRange()
         lifecycleScope.launch {
@@ -110,6 +111,7 @@ class DashboardActivity : AppCompatActivity() {
         }
     }
 
+    /** Updates the spend total, progress bar and status message based on spend vs. goals. */
     private fun renderMonthlyOverview(totalSpent: Double, goal: MonthlyGoal?) {
         tvTotalSpent.text = "R%.2f".format(totalSpent)
 
@@ -138,6 +140,7 @@ class DashboardActivity : AppCompatActivity() {
         }
     }
 
+    /** Combines all expenses with category names, live, for the Recent Expenses card. */
     private fun observeRecentExpenses() {
         lifecycleScope.launch {
             try {
@@ -155,6 +158,7 @@ class DashboardActivity : AppCompatActivity() {
         }
     }
 
+    /** Shows the most recent expenses, or a placeholder message if there are none. */
     private fun renderRecentExpenses(expenses: List<Expense>, categories: List<Category>) {
         if (expenses.isEmpty()) {
             tvRecentExpenses.gravity = Gravity.CENTER
