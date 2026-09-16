@@ -5,6 +5,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+// tests for the totals shown for each category
 class CategoryTotalsTest {
     @Test
     fun `orders categories from the largest spend downwards`() {
@@ -110,6 +111,7 @@ class CategoryTotalsTest {
         assertEquals(35.35, summary.periodTotal, TOLERANCE)
     }
 
+    // builds a category total to use in the tests
     private fun total(categoryName: String, amount: Double) =
         CategorySpendingTotal(categoryName = categoryName, totalAmount = amount)
 

@@ -3,6 +3,7 @@ package com.example.pocketpath.util
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
+// tests for the way money amounts are formatted
 class MoneyTest {
     @Test
     fun `formats a plain amount with two decimals`() {

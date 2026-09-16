@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- one expense row in the history list -->
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -68,6 +69,7 @@
             android:textSize="13sp"
             tools:text="14 Sep 2026  ·  09:30 – 10:15" />
 
+        <!-- thumbnail shown when the expense has a photo -->
         <ImageView
             android:id="@+id/imgExpensePhoto"
             android:layout_width="match_parent"
@@ -81,6 +83,7 @@
             tools:src="@mipmap/ic_launcher"
             tools:visibility="visible" />
 
+        <!-- opens the photo full screen -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnViewPhoto"
             style="@style/Widget.MaterialComponents.Button.TextButton"
@@ -98,6 +101,7 @@
             android:orientation="horizontal"
             android:gravity="end">
 
+            <!-- deletes this expense -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnDeleteExpense"
                 style="@style/Widget.MaterialComponents.Button.TextButton"

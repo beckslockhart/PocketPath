@@ -6,6 +6,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.util.Calendar
 
+// tests for the period used by the expense history screen
 class PeriodFilterTest {
     @Test
     fun `start of day strips the time from a date`() {
@@ -147,6 +148,7 @@ class PeriodFilterTest {
         )
     }
 
+    // builds a date to use in the tests
     private fun dateMillis(
         year: Int,
         month: Int,

@@ -3,6 +3,7 @@ package com.example.pocketpath.util
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
+// tests for how much a photo is shrunk when loading
 class BitmapSamplingTest {
     @Test
     fun `a photograph already smaller than the target is not shrunk`() {
