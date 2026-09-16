@@ -15,11 +15,13 @@ network connection and no account beyond the local login.
 |---|---|
 | Register and log in with a username and password | `MainActivity` |
 | Dashboard showing the month's spending against your goals | `DashboardActivity` |
+| Your five most recent expenses, shown on the dashboard | `DashboardActivity` |
 | Create, edit and delete budget categories with a monthly limit | `CategoriesActivity` |
-| Set a minimum and maximum monthly spending goal | `MonthlyGoalsActivity` |
+| Set a minimum and maximum monthly spending goal, either by typing an amount or by dragging a `SeekBar` | `MonthlyGoalsActivity` |
 | Record an expense with date, start and end times, description, category and an optional photograph | `AddExpensesActivity` |
 | List every expense in a period you choose | `ExpenseHistoryActivity` |
 | See the total spent in each category over that same period | `ExpenseHistoryActivity` |
+| Delete an expense you no longer want | `ExpenseHistoryActivity` |
 | Open an expense photograph full screen from the history list | `PhotoViewerActivity` |
 
 ### Choosing a period
@@ -170,12 +172,15 @@ appear as *Uncategorised* in the totals.
 
 ## Team
 
-This app was built as a group project. The work was split as follows:
+PocketPath was built as a group project by four students. The work was split as
+follows:
 
-- **Project structure, Room database, navigation, login and dashboard**
-- **Budget categories and monthly minimum/maximum goals**
-- **Add Expense screen, including date, times, category, description and photograph**
-- **Expense history, period filtering, category totals, photo viewing, automated tests, README and GitHub Actions**
+| Member | GitHub | Responsible for |
+|---|---|---|
+| Rebecca Lockhart | `beckslockhart` | Project structure, Room database, navigation, login and registration, and the dashboard |
+| Oliver Mann | `Dxrk-Reality` | Budget categories, monthly minimum and maximum goals, and deleting an expense |
+| Gift Zowa | `ClownBeatz` | Add Expense screen, including date, start and end times, category, description and photograph |
+| Callum Schultz | `Callumschultz` | Expense history, period filtering, category totals, photo viewing, unit tests, README and GitHub Actions |
 
 ## Demonstration video
 
