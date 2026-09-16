@@ -184,4 +184,4 @@ follows:
 
 ## Demonstration video
 
-*(Link to the demonstration video to be added before submission.)*
+https://youtu.be/6zLeNobCc6E
