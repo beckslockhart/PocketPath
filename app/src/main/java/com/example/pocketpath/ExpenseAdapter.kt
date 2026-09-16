@@ -29,7 +29,8 @@ data class ExpenseListItem(
 
 class ExpenseAdapter(
     private val imageScope: CoroutineScope,
-    private val onViewPhoto: (ExpenseListItem) -> Unit
+    private val onViewPhoto: (ExpenseListItem) -> Unit,
+    private val onDelete: (ExpenseListItem) -> Unit
 ) : ListAdapter<ExpenseListItem, ExpenseAdapter.ExpenseViewHolder>(DIFF_CALLBACK) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExpenseViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -54,6 +55,8 @@ class ExpenseAdapter(
         private val tvDateTime: TextView = itemView.findViewById(R.id.tvExpenseDateTime)
         private val imgPhoto: ImageView = itemView.findViewById(R.id.imgExpensePhoto)
         private val btnViewPhoto: MaterialButton = itemView.findViewById(R.id.btnViewPhoto)
+        private val btnDeleteExpense: MaterialButton =
+            itemView.findViewById(R.id.btnDeleteExpense)
 
         private var imageJob: Job? = null
 
@@ -69,6 +72,8 @@ class ExpenseAdapter(
                 expense.startTime,
                 expense.endTime
             )
+
+            btnDeleteExpense.setOnClickListener { onDelete(item) }
 
             bindPhoto(item)
         }

@@ -1,5 +1,6 @@
 package com.example.pocketpath
 
+import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Bundle
@@ -109,7 +110,8 @@ class ExpenseHistoryActivity : AppCompatActivity() {
     private fun configureList() {
         expenseAdapter = ExpenseAdapter(
             imageScope = lifecycleScope,
-            onViewPhoto = ::openPhoto
+            onViewPhoto = ::openPhoto,
+            onDelete = ::confirmDeleteExpense
         )
 
         recyclerExpenses.layoutManager = LinearLayoutManager(this)
@@ -269,6 +271,28 @@ class ExpenseHistoryActivity : AppCompatActivity() {
                 putExtra(PhotoViewerActivity.EXTRA_EXPENSE_DATE, item.expense.expenseDate)
             }
         )
+    }
+
+    private fun confirmDeleteExpense(item: ExpenseListItem) {
+        AlertDialog.Builder(this)
+            .setTitle("Delete expense?")
+            .setMessage("Delete \"${item.expense.description}\"? This cannot be undone.")
+            .setPositiveButton("Delete") { _, _ ->
+                lifecycleScope.launch {
+                    try {
+                        database.expenseDao().deleteExpense(item.expense)
+                    } catch (exception: Exception) {
+                        Log.e(TAG, "Unable to delete expense", exception)
+                        Toast.makeText(
+                            this@ExpenseHistoryActivity,
+                            "Unable to delete expense",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     private fun returnToLogin() {

@@ -1,7 +1,10 @@
 package com.example.pocketpath
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
+import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -22,7 +25,13 @@ class MonthlyGoalsActivity : AppCompatActivity() {
     private lateinit var maximumLayout: TextInputLayout
     private lateinit var etMinimum: TextInputEditText
     private lateinit var etMaximum: TextInputEditText
+    private lateinit var seekMinimum: SeekBar
+    private lateinit var seekMaximum: SeekBar
     private var currentUserId = -1L
+
+    /** Prevents a text field and its SeekBar from triggering each other in a loop. */
+    private var isSyncingMinimum = false
+    private var isSyncingMaximum = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,20 +50,95 @@ class MonthlyGoalsActivity : AppCompatActivity() {
         maximumLayout = findViewById(R.id.maximumLayout)
         etMinimum = findViewById(R.id.etMinimum)
         etMaximum = findViewById(R.id.etMaximum)
+        seekMinimum = findViewById(R.id.seekMinimum)
+        seekMaximum = findViewById(R.id.seekMaximum)
 
         findViewById<MaterialButton>(R.id.btnBack).setOnClickListener { finish() }
         findViewById<MaterialButton>(R.id.btnSaveGoals).setOnClickListener { saveGoals() }
 
+        configureMinimumSync()
+        configureMaximumSync()
         observeExistingGoal()
     }
+
+    /** Keeps the minimum text field and its SeekBar showing the same value. */
+    private fun configureMinimumSync() {
+        etMinimum.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                if (isSyncingMinimum) return
+                val amount = s?.toString()?.toDoubleOrNull() ?: return
+                isSyncingMinimum = true
+                seekMinimum.progress = amountToProgress(amount)
+                isSyncingMinimum = false
+            }
+        })
+
+        seekMinimum.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (!fromUser || isSyncingMinimum) return
+                isSyncingMinimum = true
+                etMinimum.setText(progressToAmount(progress).toString())
+                etMinimum.setSelection(etMinimum.text?.length ?: 0)
+                isSyncingMinimum = false
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
+    }
+
+    /** Keeps the maximum text field and its SeekBar showing the same value. */
+    private fun configureMaximumSync() {
+        etMaximum.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                if (isSyncingMaximum) return
+                val amount = s?.toString()?.toDoubleOrNull() ?: return
+                isSyncingMaximum = true
+                seekMaximum.progress = amountToProgress(amount)
+                isSyncingMaximum = false
+            }
+        })
+
+        seekMaximum.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (!fromUser || isSyncingMaximum) return
+                isSyncingMaximum = true
+                etMaximum.setText(progressToAmount(progress).toString())
+                etMaximum.setSelection(etMaximum.text?.length ?: 0)
+                isSyncingMaximum = false
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
+    }
+
+    private fun amountToProgress(amount: Double): Int =
+        (amount / SEEKBAR_STEP).toInt().coerceIn(0, SEEKBAR_MAX)
+
+    private fun progressToAmount(progress: Int): Double =
+        (progress * SEEKBAR_STEP)
 
     private fun observeExistingGoal() {
         lifecycleScope.launch {
             try {
                 database.monthlyGoalDao().getMonthlyGoal(currentUserId).collectLatest { goal ->
                     if (goal != null) {
+                        isSyncingMinimum = true
                         etMinimum.setText(goal.minimumAmount.toString())
+                        seekMinimum.progress = amountToProgress(goal.minimumAmount)
+                        isSyncingMinimum = false
+
+                        isSyncingMaximum = true
                         etMaximum.setText(goal.maximumAmount.toString())
+                        seekMaximum.progress = amountToProgress(goal.maximumAmount)
+                        isSyncingMaximum = false
                     }
                 }
             } catch (exception: Exception) {
@@ -105,5 +189,7 @@ class MonthlyGoalsActivity : AppCompatActivity() {
         private const val TAG = "PocketPathMonthlyGoals"
         private const val PREFERENCES_NAME = "pocketpath_preferences"
         private const val KEY_USER_ID = "logged_in_user_id"
+        private const val SEEKBAR_MAX = 100
+        private const val SEEKBAR_STEP = 100.0 // each SeekBar unit = R100, so max = R10 000
     }
 }

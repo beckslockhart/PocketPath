@@ -3,17 +3,23 @@ package com.example.pocketpath
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.example.pocketpath.data.entity.Category
+import com.example.pocketpath.data.entity.Expense
 import com.example.pocketpath.data.database.PocketPathDatabase
 import com.example.pocketpath.data.entity.MonthlyGoal
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 class DashboardActivity : AppCompatActivity() {
 
@@ -24,6 +30,7 @@ class DashboardActivity : AppCompatActivity() {
     private lateinit var tvBudgetStatus: TextView
     private lateinit var tvMinimumGoal: TextView
     private lateinit var tvMaximumGoal: TextView
+    private lateinit var tvRecentExpenses: TextView
 
     private var currentUserId: Long = -1L
 
@@ -31,6 +38,9 @@ class DashboardActivity : AppCompatActivity() {
         private const val TAG = "PocketPathDashboard"
         private const val PREFERENCES_NAME = "pocketpath_preferences"
         private const val KEY_USER_ID = "logged_in_user_id"
+        private const val RECENT_EXPENSE_LIMIT = 5
+
+        private val DATE_FORMAT = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,9 +65,11 @@ class DashboardActivity : AppCompatActivity() {
         tvBudgetStatus = findViewById(R.id.tvBudgetStatus)
         tvMinimumGoal = findViewById(R.id.tvMinimumGoal)
         tvMaximumGoal = findViewById(R.id.tvMaximumGoal)
+        tvRecentExpenses = findViewById(R.id.tvRecentExpenses)
 
         loadUserDetails()
         observeMonthlyOverview()
+        observeRecentExpenses()
         configureButtons()
     }
 
@@ -124,6 +136,45 @@ class DashboardActivity : AppCompatActivity() {
             totalSpent < goal.minimumAmount -> "Below your minimum spending goal so far"
             else -> "On track with your monthly goals"
         }
+    }
+
+    private fun observeRecentExpenses() {
+        lifecycleScope.launch {
+            try {
+                combine(
+                    database.expenseDao().getAllExpensesForUser(currentUserId),
+                    database.categoryDao().getCategoriesForUser(currentUserId)
+                ) { expenses, categories ->
+                    expenses to categories
+                }.collectLatest { (expenses, categories) ->
+                    renderRecentExpenses(expenses, categories)
+                }
+            } catch (exception: Exception) {
+                Log.e(TAG, "Unable to load recent expenses", exception)
+            }
+        }
+    }
+
+    private fun renderRecentExpenses(expenses: List<Expense>, categories: List<Category>) {
+        if (expenses.isEmpty()) {
+            tvRecentExpenses.gravity = Gravity.CENTER
+            tvRecentExpenses.text = "No expenses recorded yet"
+            return
+        }
+
+        val categoryNamesById = categories.associate { it.categoryId to it.name }
+
+        val lines = expenses.take(RECENT_EXPENSE_LIMIT).map { expense ->
+            val categoryName = expense.categoryId
+                ?.let { categoryNamesById[it] }
+                ?: "Uncategorised"
+            val dateText = DATE_FORMAT.format(Date(expense.expenseDate))
+            "${expense.description}  ·  R%.2f".format(expense.amount) +
+                    "\n$categoryName  ·  $dateText"
+        }
+
+        tvRecentExpenses.gravity = Gravity.START
+        tvRecentExpenses.text = lines.joinToString("\n\n")
     }
 
     private fun configureButtons() {
