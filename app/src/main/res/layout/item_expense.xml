@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- one expense row in the history list -->
+<!-- Displays one expense inside the Expense History list. -->
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -8,9 +8,11 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="2dp"
-    app:strokeWidth="0dp">
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="14dp"
+    app:cardElevation="1dp"
+    app:strokeColor="#D8E5E3"
+    app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -18,11 +20,13 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- Main expense information. -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:baselineAligned="false">
+            android:baselineAligned="false"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -34,6 +38,7 @@
                     android:id="@+id/tvExpenseDescription"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textColor="#123F43"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     tools:text="Weekly grocery shop" />
@@ -42,8 +47,8 @@
                     android:id="@+id/tvExpenseCategory"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:textColor="#666666"
+                    android:layout_marginTop="3dp"
+                    android:textColor="#607372"
                     android:textSize="13sp"
                     tools:text="Groceries" />
 
@@ -54,36 +59,39 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
-                android:textSize="16sp"
+                android:textColor="#176B66"
+                android:textSize="17sp"
                 android:textStyle="bold"
                 tools:text="R450.00" />
 
         </LinearLayout>
 
+        <!-- Date and time recorded for the expense. -->
         <TextView
             android:id="@+id/tvExpenseDateTime"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textColor="#666666"
+            android:layout_marginTop="9dp"
+            android:textColor="#607372"
             android:textSize="13sp"
             tools:text="14 Sep 2026  ·  09:30 – 10:15" />
 
-        <!-- thumbnail shown when the expense has a photo -->
+        <!-- Preview displayed when an attachment is available. -->
         <ImageView
             android:id="@+id/imgExpensePhoto"
             android:layout_width="match_parent"
             android:layout_height="160dp"
             android:layout_marginTop="12dp"
             android:adjustViewBounds="true"
-            android:background="#EEEEEE"
+            android:background="#E8F3F1"
+            android:clipToOutline="true"
             android:contentDescription="@string/expense_photograph_preview"
             android:scaleType="centerCrop"
             android:visibility="gone"
             tools:src="@mipmap/ic_launcher"
             tools:visibility="visible" />
 
-        <!-- opens the photo full screen -->
+        <!-- Opens the saved attachment in the viewer. -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnViewPhoto"
             style="@style/Widget.MaterialComponents.Button.TextButton"
@@ -91,24 +99,26 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="@string/view_photograph"
+            android:textColor="#176B66"
             android:visibility="gone"
+            app:iconTint="#176B66"
             tools:visibility="visible" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:orientation="horizontal"
-            android:gravity="end">
+            android:layout_marginTop="6dp"
+            android:gravity="end"
+            android:orientation="horizontal">
 
-            <!-- deletes this expense -->
+            <!-- Deletes the selected expense after confirmation. -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnDeleteExpense"
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Delete"
-                android:textColor="#D32F2F" />
+                android:textColor="#C43D3D" />
 
         </LinearLayout>
 
