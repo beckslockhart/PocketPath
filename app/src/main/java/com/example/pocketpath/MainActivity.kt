@@ -54,6 +54,17 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        /*
+         * Open the dashboard immediately when a saved login session exists.
+         * The user will only return to this screen after logging out.
+         */
+        if (isUserLoggedIn()) {
+            Log.d(TAG, "Existing login session found")
+            openDashboard()
+            return
+        }
+
         setContentView(R.layout.activity_main)
 
         // Retrieve the shared Room database instance.
@@ -141,11 +152,13 @@ class MainActivity : AppCompatActivity() {
         // Database operations run inside a coroutine to avoid blocking the UI.
         lifecycleScope.launch {
             try {
-                val existingUser = database.userDao().getUserByUsername(username)
+                val existingUser =
+                    database.userDao().getUserByUsername(username)
 
                 // Usernames must be unique.
                 if (existingUser != null) {
-                    usernameLayout.error = "This username is already registered"
+                    usernameLayout.error =
+                        "This username is already registered"
                     return@launch
                 }
 
@@ -156,7 +169,10 @@ class MainActivity : AppCompatActivity() {
                     )
                 )
 
-                Log.d(TAG, "User registered successfully with ID: $userId")
+                Log.d(
+                    TAG,
+                    "User registered successfully with ID: $userId"
+                )
 
                 Toast.makeText(
                     this@MainActivity,
@@ -191,15 +207,27 @@ class MainActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
-                val user = database.userDao().login(username, password)
+                val user = database.userDao().login(
+                    username,
+                    password
+                )
 
                 if (user == null) {
-                    passwordLayout.error = "Incorrect username or password"
-                    Log.w(TAG, "Failed login attempt for username: $username")
+                    passwordLayout.error =
+                        "Incorrect username or password"
+
+                    Log.w(
+                        TAG,
+                        "Failed login attempt for username: $username"
+                    )
+
                     return@launch
                 }
 
-                Log.d(TAG, "User logged in successfully with ID: ${user.userId}")
+                Log.d(
+                    TAG,
+                    "User logged in successfully with ID: ${user.userId}"
+                )
 
                 saveLoggedInUser(user.userId)
                 openDashboard()
@@ -229,7 +257,8 @@ class MainActivity : AppCompatActivity() {
             usernameLayout.error = "Username is required"
             isValid = false
         } else if (username.length < 3) {
-            usernameLayout.error = "Username must contain at least 3 characters"
+            usernameLayout.error =
+                "Username must contain at least 3 characters"
             isValid = false
         }
 
@@ -237,15 +266,18 @@ class MainActivity : AppCompatActivity() {
             passwordLayout.error = "Password is required"
             isValid = false
         } else if (password.length < 6) {
-            passwordLayout.error = "Password must contain at least 6 characters"
+            passwordLayout.error =
+                "Password must contain at least 6 characters"
             isValid = false
         }
 
         if (confirmPassword.isBlank()) {
-            confirmPasswordLayout.error = "Please confirm your password"
+            confirmPasswordLayout.error =
+                "Please confirm your password"
             isValid = false
         } else if (password != confirmPassword) {
-            confirmPasswordLayout.error = "Passwords do not match"
+            confirmPasswordLayout.error =
+                "Passwords do not match"
             isValid = false
         }
 
@@ -284,12 +316,26 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
+     * Checks whether an earlier login session is still stored.
+     */
+    private fun isUserLoggedIn(): Boolean {
+        val savedUserId = getSharedPreferences(
+            PREFERENCES_NAME,
+            MODE_PRIVATE
+        ).getLong(KEY_USER_ID, -1L)
+
+        return savedUserId != -1L
+    }
+
+    /**
      * Stores the active user's ID so the other screens can retrieve
      * information belonging to the correct user.
      */
     private fun saveLoggedInUser(userId: Long) {
-        getSharedPreferences(PREFERENCES_NAME, MODE_PRIVATE)
-            .edit()
+        getSharedPreferences(
+            PREFERENCES_NAME,
+            MODE_PRIVATE
+        ).edit()
             .putLong(KEY_USER_ID, userId)
             .apply()
     }
@@ -298,7 +344,11 @@ class MainActivity : AppCompatActivity() {
      * Opens the Dashboard after successful registration or login.
      */
     private fun openDashboard() {
-        val intent = Intent(this, DashboardActivity::class.java)
+        val intent = Intent(
+            this,
+            DashboardActivity::class.java
+        )
+
         startActivity(intent)
         finish()
     }
