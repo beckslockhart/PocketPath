@@ -1,24 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="24dp">
+    android:paddingStart="24dp"
+    android:paddingTop="12dp"
+    android:paddingEnd="24dp"
+    android:paddingBottom="8dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="18dp"
+        android:text="Enter a name and monthly spending limit."
+        android:textColor="#607372"
+        android:textSize="13sp" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/nameLayout"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Category name">
+        android:hint="Category name"
+        app:boxCornerRadiusBottomEnd="12dp"
+        app:boxCornerRadiusBottomStart="12dp"
+        app:boxCornerRadiusTopEnd="12dp"
+        app:boxCornerRadiusTopStart="12dp"
+        app:boxStrokeColor="#176B66"
+        app:hintTextColor="#176B66">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etCategoryName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:imeOptions="actionNext"
             android:inputType="textCapWords"
-            android:maxLength="40" />
+            android:maxLength="40"
+            android:minHeight="56dp"
+            android:textColor="#123F43"
+            android:textSize="16sp" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -27,14 +50,27 @@
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:hint="Monthly limit (R)">
+        android:layout_marginTop="16dp"
+        android:hint="Monthly limit"
+        app:boxCornerRadiusBottomEnd="12dp"
+        app:boxCornerRadiusBottomStart="12dp"
+        app:boxCornerRadiusTopEnd="12dp"
+        app:boxCornerRadiusTopStart="12dp"
+        app:boxStrokeColor="#176B66"
+        app:hintTextColor="#176B66"
+        app:prefixText="R ">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etCategoryLimit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="numberDecimal" />
+            android:digits="0123456789."
+            android:imeOptions="actionDone"
+            android:inputType="numberDecimal"
+            android:maxLength="10"
+            android:minHeight="56dp"
+            android:textColor="#123F43"
+            android:textSize="16sp" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
