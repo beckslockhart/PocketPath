@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "943938787670",
+    "project_id": "pocketpath-18c27",
+    "storage_bucket": "pocketpath-18c27.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:943938787670:android:b29fc2b1ee23b815ff5ef7",
+        "android_client_info": {
+          "package_name": "com.example.pocketpath"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCkB7m1W8wToSDmcLNM8Dez2C7CsRagbKA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
