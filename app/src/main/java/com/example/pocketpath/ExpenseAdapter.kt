@@ -1,17 +1,16 @@
 package com.example.pocketpath
 
+import android.graphics.BitmapFactory
+import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.net.toUri
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.pocketpath.data.entity.Expense
-import com.example.pocketpath.util.Money
-import com.example.pocketpath.util.PhotoLoader
+import com.example.pocketpath.data.firebase.FirebaseRepository.ExpenseData
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,19 +21,17 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-// one row of the expense history list
 data class ExpenseListItem(
-    val expense: Expense,
+    val expense: ExpenseData,
     val categoryName: String
 )
 
-// fills the expense history list with rows
 class ExpenseAdapter(
     private val imageScope: CoroutineScope,
     private val onViewPhoto: (ExpenseListItem) -> Unit,
     private val onDelete: (ExpenseListItem) -> Unit
 ) : ListAdapter<ExpenseListItem, ExpenseAdapter.ExpenseViewHolder>(DIFF_CALLBACK) {
-    // creates a new empty row
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExpenseViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_expense, parent, false)
@@ -42,18 +39,15 @@ class ExpenseAdapter(
         return ExpenseViewHolder(view)
     }
 
-    // puts one expense into a row
     override fun onBindViewHolder(holder: ExpenseViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
 
-    // stops loading a photo for a row that is being reused
     override fun onViewRecycled(holder: ExpenseViewHolder) {
         super.onViewRecycled(holder)
         holder.clearPendingImage()
     }
 
-    // holds the views that make up one row
     inner class ExpenseViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val tvDescription: TextView = itemView.findViewById(R.id.tvExpenseDescription)
         private val tvCategory: TextView = itemView.findViewById(R.id.tvExpenseCategory)
@@ -64,16 +58,14 @@ class ExpenseAdapter(
         private val btnDeleteExpense: MaterialButton =
             itemView.findViewById(R.id.btnDeleteExpense)
 
-        // the photo load running for this row
         private var imageJob: Job? = null
 
-        // shows the details of one expense in the row
         fun bind(item: ExpenseListItem) {
             val expense = item.expense
 
             tvDescription.text = expense.description
             tvCategory.text = item.categoryName
-            tvAmount.text = Money.format(expense.amount)
+            tvAmount.text = "R%.2f".format(expense.amount)
             tvDateTime.text = itemView.context.getString(
                 R.string.expense_date_time_format,
                 DATE_FORMAT.format(Date(expense.expenseDate)),
@@ -81,20 +73,17 @@ class ExpenseAdapter(
                 expense.endTime
             )
 
-            // delete button for this expense
             btnDeleteExpense.setOnClickListener { onDelete(item) }
 
             bindPhoto(item)
         }
 
-        // shows the photo thumbnail when the expense has one
         private fun bindPhoto(item: ExpenseListItem) {
             clearPendingImage()
 
-            val photoUri = item.expense.photoUri
+            val photoBase64 = item.expense.photoBase64
 
-            // no photo so hide the photo views
-            if (photoUri.isNullOrBlank()) {
+            if (photoBase64.isNullOrBlank()) {
                 imgPhoto.visibility = View.GONE
                 btnViewPhoto.visibility = View.GONE
                 itemView.setOnClickListener(null)
@@ -107,23 +96,20 @@ class ExpenseAdapter(
             btnViewPhoto.setOnClickListener { onViewPhoto(item) }
             itemView.setOnClickListener { onViewPhoto(item) }
 
-            // tag the row so a slow load cannot land on the wrong expense
-            imgPhoto.tag = photoUri
+            imgPhoto.tag = photoBase64
             imgPhoto.setImageDrawable(null)
 
-            // load the photo off the main thread
             imageJob = imageScope.launch {
                 val bitmap = withContext(Dispatchers.IO) {
-                    PhotoLoader.loadScaled(
-                        context = itemView.context,
-                        uri = photoUri.toUri(),
-                        targetWidth = THUMBNAIL_WIDTH,
-                        targetHeight = THUMBNAIL_HEIGHT
-                    )
+                    try {
+                        val bytes = Base64.decode(photoBase64, Base64.NO_WRAP)
+                        BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                    } catch (exception: Exception) {
+                        null
+                    }
                 }
 
-                // only use the photo if the row still shows the same expense
-                if (imgPhoto.tag == photoUri) {
+                if (imgPhoto.tag == photoBase64) {
                     if (bitmap != null) {
                         imgPhoto.setImageBitmap(bitmap)
                     } else {
@@ -133,21 +119,15 @@ class ExpenseAdapter(
             }
         }
 
-        // cancels a photo load that is no longer needed
         fun clearPendingImage() {
             imageJob?.cancel()
             imageJob = null
         }
     }
 
-    // values shared by every row
     companion object {
-        private const val THUMBNAIL_WIDTH = 600
-        private const val THUMBNAIL_HEIGHT = 400
-
         private val DATE_FORMAT = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
 
-        // works out which rows changed when the list updates
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<ExpenseListItem>() {
             override fun areItemsTheSame(
                 oldItem: ExpenseListItem,

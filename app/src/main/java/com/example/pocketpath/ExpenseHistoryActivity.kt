@@ -16,14 +16,9 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.pocketpath.data.dao.CategorySpendingTotal
-import com.example.pocketpath.data.database.PocketPathDatabase
-import com.example.pocketpath.data.entity.Category
-import com.example.pocketpath.data.entity.Expense
-import com.example.pocketpath.util.CategoryTotals
-import com.example.pocketpath.util.Money
-import com.example.pocketpath.util.Period
-import com.example.pocketpath.util.PeriodFilter
+import com.example.pocketpath.data.firebase.FirebaseRepository
+import com.example.pocketpath.data.firebase.FirebaseRepository.CategoryData
+import com.example.pocketpath.data.firebase.FirebaseRepository.ExpenseData
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -37,13 +32,10 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-// shows the expenses for a chosen period and the totals per category
 class ExpenseHistoryActivity : AppCompatActivity() {
-    // the room database used to read expenses and categories
-    private lateinit var database: PocketPathDatabase
+
     private lateinit var expenseAdapter: ExpenseAdapter
 
-    // the views on this screen
     private lateinit var fromDateLayout: TextInputLayout
     private lateinit var toDateLayout: TextInputLayout
     private lateinit var etFromDate: TextInputEditText
@@ -53,32 +45,26 @@ class ExpenseHistoryActivity : AppCompatActivity() {
     private lateinit var recyclerExpenses: RecyclerView
     private lateinit var tvEmptyState: TextView
 
-    // id of the user who is logged in
-    private var currentUserId = -1L
+    private var currentUserId: String? = null
 
-    // the two days the user picked for the period
     private var firstDayMillis = 0L
     private var lastDayMillis = 0L
 
-    // watches the database for the chosen period
     private var observeJob: Job? = null
 
-    // sets the screen up when it opens
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_expense_history)
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        database = PocketPathDatabase.getDatabase(this)
-        currentUserId = getSharedPreferences(PREFERENCES_NAME, MODE_PRIVATE)
-            .getLong(KEY_USER_ID, -1L)
+        currentUserId = FirebaseRepository.currentUserId
 
-        // no user is logged in so go back to the login screen
-        if (currentUserId == -1L) {
+        if (currentUserId == null) {
             returnToLogin()
             return
         }
@@ -90,7 +76,6 @@ class ExpenseHistoryActivity : AppCompatActivity() {
         observeSelectedPeriod()
     }
 
-    // links the variables to the views in the layout
     private fun connectViews() {
         fromDateLayout = findViewById(R.id.fromDateLayout)
         toDateLayout = findViewById(R.id.toDateLayout)
@@ -102,22 +87,20 @@ class ExpenseHistoryActivity : AppCompatActivity() {
         tvEmptyState = findViewById(R.id.tvEmptyState)
     }
 
-    // starts on this month unless a period was saved before
     private fun restoreSelectedPeriod(savedInstanceState: Bundle?) {
-        val thisMonth = PeriodFilter.currentMonth()
+        val (monthStart, monthEnd) = currentMonthRange()
 
         firstDayMillis = savedInstanceState?.getLong(STATE_FIRST_DAY)
             ?.takeIf { it > 0L }
-            ?: thisMonth.startMillis
+            ?: monthStart
 
         lastDayMillis = savedInstanceState?.getLong(STATE_LAST_DAY)
             ?.takeIf { it > 0L }
-            ?: thisMonth.endMillis
+            ?: monthEnd
 
         updatePeriodText()
     }
 
-    // sets up the list of expenses
     private fun configureList() {
         expenseAdapter = ExpenseAdapter(
             imageScope = lifecycleScope,
@@ -129,7 +112,6 @@ class ExpenseHistoryActivity : AppCompatActivity() {
         recyclerExpenses.adapter = expenseAdapter
     }
 
-    // sets up the back button the date fields and the reset button
     private fun configureInputs() {
         findViewById<MaterialButton>(R.id.btnBack).setOnClickListener { finish() }
 
@@ -139,16 +121,15 @@ class ExpenseHistoryActivity : AppCompatActivity() {
         toDateLayout.setEndIconOnClickListener { openPeriodPicker(isFromDate = false) }
 
         findViewById<MaterialButton>(R.id.btnThisMonth).setOnClickListener {
-            val thisMonth = PeriodFilter.currentMonth()
-            firstDayMillis = thisMonth.startMillis
-            lastDayMillis = thisMonth.endMillis
+            val (monthStart, monthEnd) = currentMonthRange()
+            firstDayMillis = monthStart
+            lastDayMillis = monthEnd
             toDateLayout.error = null
             updatePeriodText()
             observeSelectedPeriod()
         }
     }
 
-    // opens a date picker for the from field or the to field
     private fun openPeriodPicker(isFromDate: Boolean) {
         val current = if (isFromDate) firstDayMillis else lastDayMillis
         val calendar = Calendar.getInstance().apply { timeInMillis = current }
@@ -169,13 +150,11 @@ class ExpenseHistoryActivity : AppCompatActivity() {
         ).show()
     }
 
-    // uses the picked date if the period still makes sense
     private fun applyChosenDate(chosenMillis: Long, isFromDate: Boolean) {
         val proposedFirstDay = if (isFromDate) chosenMillis else firstDayMillis
         val proposedLastDay = if (isFromDate) lastDayMillis else chosenMillis
 
-        // the end is before the start so show an error and stop
-        if (!PeriodFilter.isValidSelection(proposedFirstDay, proposedLastDay)) {
+        if (proposedLastDay < proposedFirstDay) {
             toDateLayout.error = getString(R.string.period_end_before_start)
             return
         }
@@ -188,38 +167,36 @@ class ExpenseHistoryActivity : AppCompatActivity() {
         observeSelectedPeriod()
     }
 
-    // shows the chosen dates in the two fields
     private fun updatePeriodText() {
         etFromDate.setText(DATE_FORMAT.format(Date(firstDayMillis)))
         etToDate.setText(DATE_FORMAT.format(Date(lastDayMillis)))
     }
 
-    // watches the expenses and the totals for the chosen period
     private fun observeSelectedPeriod() {
-        val period: Period = PeriodFilter.periodBetween(firstDayMillis, lastDayMillis)
+        val uid = currentUserId ?: return
 
-        // stop watching the period that was chosen before
+        val periodStart = startOfDay(firstDayMillis)
+        val periodEnd = endOfDay(lastDayMillis)
+
         observeJob?.cancel()
         observeJob = lifecycleScope.launch {
             try {
                 combine(
-                    database.expenseDao().getExpensesForPeriod(
-                        currentUserId, period.startMillis, period.endMillis
-                    ),
-                    database.categoryDao().getCategoriesForUser(currentUserId),
-                    database.expenseDao().getCategoryTotalsForPeriod(
-                        currentUserId, period.startMillis, period.endMillis
-                    )
+                    FirebaseRepository.observeExpenses(uid),
+                    FirebaseRepository.observeCategories(uid),
+                    FirebaseRepository.observeCategoryTotalsForPeriod(uid, periodStart, periodEnd)
                 ) { expenses, categories, totals ->
                     Triple(expenses, categories, totals)
                 }.collectLatest { (expenses, categories, totals) ->
-                    renderExpenses(expenses, categories)
-                    renderCategoryTotals(totals)
+                    val expensesInPeriod = expenses
+                        .filter { it.expenseDate in periodStart..periodEnd }
+                        .sortedByDescending { it.expenseDate }
+
+                    renderExpenses(expensesInPeriod, categories)
+                    renderCategoryTotals(totals, categories)
                 }
-            // changing the period cancels the old watch which is normal
             } catch (cancellation: CancellationException) {
                 throw cancellation
-            // something really went wrong so tell the user
             } catch (exception: Exception) {
                 Log.e(TAG, "Unable to load expense history", exception)
                 Toast.makeText(
@@ -231,8 +208,7 @@ class ExpenseHistoryActivity : AppCompatActivity() {
         }
     }
 
-    // builds the rows and shows a message when nothing matches
-    private fun renderExpenses(expenses: List<Expense>, categories: List<Category>) {
+    private fun renderExpenses(expenses: List<ExpenseData>, categories: List<CategoryData>) {
         val categoryNamesById = categories.associate { it.categoryId to it.name }
         val uncategorised = getString(R.string.uncategorised)
 
@@ -252,15 +228,14 @@ class ExpenseHistoryActivity : AppCompatActivity() {
         recyclerExpenses.visibility = if (isEmpty) View.GONE else View.VISIBLE
     }
 
-    // shows how much was spent in each category
-    private fun renderCategoryTotals(totals: List<CategorySpendingTotal>) {
-        val summary = CategoryTotals.summarise(totals)
+    private fun renderCategoryTotals(totals: Map<String, Double>, categories: List<CategoryData>) {
+        val categoryNamesById = categories.associate { it.categoryId to it.name }
+        val periodTotal = totals.values.sum()
 
-        tvPeriodTotal.text = Money.format(summary.periodTotal)
+        tvPeriodTotal.text = "R%.2f".format(periodTotal)
         categoryTotalsContainer.removeAllViews()
 
-        // nothing was spent so show a short message instead of rows
-        if (summary.isEmpty) {
+        if (totals.isEmpty()) {
             val emptyText = TextView(this).apply {
                 setText(R.string.no_category_totals)
                 setTextColor(SECONDARY_TEXT_COLOR)
@@ -271,41 +246,48 @@ class ExpenseHistoryActivity : AppCompatActivity() {
         }
 
         val inflater = LayoutInflater.from(this)
-        summary.rows.forEach { row ->
-            val rowView = inflater.inflate(
-                R.layout.item_category_total, categoryTotalsContainer, false
-            )
 
-            rowView.findViewById<TextView>(R.id.tvTotalCategoryName).text = row.categoryName
-            rowView.findViewById<TextView>(R.id.tvTotalCategoryAmount).text =
-                Money.formatWithShare(row.totalAmount, summary.periodTotal)
+        totals.entries
+            .sortedByDescending { it.value }
+            .forEach { (categoryId, amount) ->
+                val rowView = inflater.inflate(
+                    R.layout.item_category_total, categoryTotalsContainer, false
+                )
 
-            categoryTotalsContainer.addView(rowView)
-        }
+                val share = if (periodTotal > 0.0) (amount / periodTotal) * 100 else 0.0
+
+                rowView.findViewById<TextView>(R.id.tvTotalCategoryName).text =
+                    categoryNamesById[categoryId] ?: getString(R.string.uncategorised)
+
+                rowView.findViewById<TextView>(R.id.tvTotalCategoryAmount).text =
+                    "R%.2f (%.0f%%)".format(amount, share)
+
+                categoryTotalsContainer.addView(rowView)
+            }
     }
 
-    // opens the photo that belongs to this expense
     private fun openPhoto(item: ExpenseListItem) {
-        val photoUri = item.expense.photoUri ?: return
+        val photoBase64 = item.expense.photoBase64 ?: return
 
         startActivity(
             Intent(this, PhotoViewerActivity::class.java).apply {
-                putExtra(PhotoViewerActivity.EXTRA_PHOTO_URI, photoUri)
+                putExtra(PhotoViewerActivity.EXTRA_PHOTO_BASE64, photoBase64)
                 putExtra(PhotoViewerActivity.EXTRA_DESCRIPTION, item.expense.description)
                 putExtra(PhotoViewerActivity.EXTRA_EXPENSE_DATE, item.expense.expenseDate)
             }
         )
     }
 
-    // asks the user before deleting an expense
     private fun confirmDeleteExpense(item: ExpenseListItem) {
+        val uid = currentUserId ?: return
+
         AlertDialog.Builder(this)
             .setTitle("Delete expense?")
             .setMessage("Delete \"${item.expense.description}\"? This cannot be undone.")
             .setPositiveButton("Delete") { _, _ ->
                 lifecycleScope.launch {
                     try {
-                        database.expenseDao().deleteExpense(item.expense)
+                        FirebaseRepository.deleteExpense(uid, item.expense.expenseId)
                     } catch (exception: Exception) {
                         Log.e(TAG, "Unable to delete expense", exception)
                         Toast.makeText(
@@ -320,7 +302,6 @@ class ExpenseHistoryActivity : AppCompatActivity() {
             .show()
     }
 
-    // sends the user back to the login screen
     private fun returnToLogin() {
         startActivity(
             Intent(this, MainActivity::class.java).apply {
@@ -330,18 +311,50 @@ class ExpenseHistoryActivity : AppCompatActivity() {
         finish()
     }
 
-    // keeps the chosen period when the screen rotates
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putLong(STATE_FIRST_DAY, firstDayMillis)
         outState.putLong(STATE_LAST_DAY, lastDayMillis)
     }
 
-    // keys and settings used by this screen
+    private fun startOfDay(millis: Long): Long = Calendar.getInstance().apply {
+        timeInMillis = millis
+        set(Calendar.HOUR_OF_DAY, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+    }.timeInMillis
+
+    private fun endOfDay(millis: Long): Long = Calendar.getInstance().apply {
+        timeInMillis = millis
+        set(Calendar.HOUR_OF_DAY, 23)
+        set(Calendar.MINUTE, 59)
+        set(Calendar.SECOND, 59)
+        set(Calendar.MILLISECOND, 999)
+    }.timeInMillis
+
+    private fun currentMonthRange(): Pair<Long, Long> {
+        val start = Calendar.getInstance().apply {
+            set(Calendar.DAY_OF_MONTH, 1)
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }.timeInMillis
+
+        val end = Calendar.getInstance().apply {
+            set(Calendar.DAY_OF_MONTH, getActualMaximum(Calendar.DAY_OF_MONTH))
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }.timeInMillis
+
+        return start to end
+    }
+
     companion object {
         private const val TAG = "PocketPathHistory"
-        private const val PREFERENCES_NAME = "pocketpath_preferences"
-        private const val KEY_USER_ID = "logged_in_user_id"
         private const val STATE_FIRST_DAY = "selected_first_day"
         private const val STATE_LAST_DAY = "selected_last_day"
         private const val SECONDARY_TEXT_COLOR = 0xFF666666.toInt()

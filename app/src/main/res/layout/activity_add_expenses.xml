@@ -28,13 +28,17 @@
             android:id="@+id/btnBack"
             style="@style/Widget.Material3.Button.TextButton"
             android:layout_width="wrap_content"
-            android:layout_height="52dp"
-            android:paddingStart="4dp"
-            android:paddingEnd="16dp"
+            android:layout_height="56dp"
+            android:minWidth="88dp"
+            android:minHeight="56dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="20dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
             android:text="@string/add_expense_back"
             android:textAllCaps="false"
             android:textColor="#176B65"
-            android:textSize="16sp" />
+            android:textSize="18sp" />
 
         <!-- Main screen heading. -->
         <TextView

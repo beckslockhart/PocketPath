@@ -3,63 +3,46 @@ package com.example.pocketpath
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.util.Patterns
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.example.pocketpath.data.database.PocketPathDatabase
-import com.example.pocketpath.data.entity.User
+import com.example.pocketpath.data.firebase.FirebaseRepository
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import kotlinx.coroutines.launch
 
-/**
- * Handles user registration and login for PocketPath.
- *
- * User accounts are stored locally using RoomDB. After successful
- * authentication, the active user's ID is stored for use by other screens.
- */
 class MainActivity : AppCompatActivity() {
 
-    // Provides access to the local Room database and its DAO interfaces.
-    private lateinit var database: PocketPathDatabase
-
-    // TextInputLayouts are used to display validation errors.
     private lateinit var usernameLayout: TextInputLayout
+    private lateinit var emailLayout: TextInputLayout
     private lateinit var passwordLayout: TextInputLayout
     private lateinit var confirmPasswordLayout: TextInputLayout
 
-    // Input fields containing the user's authentication details.
     private lateinit var etUsername: TextInputEditText
+    private lateinit var etEmail: TextInputEditText
     private lateinit var etPassword: TextInputEditText
     private lateinit var etConfirmPassword: TextInputEditText
 
-    // Text displayed at the top of the authentication card.
     private lateinit var tvAuthTitle: TextView
     private lateinit var tvAuthSubtitle: TextView
 
     private lateinit var btnPrimaryAction: MaterialButton
     private lateinit var btnSwitchAuthMode: MaterialButton
 
-    // Determines whether the interface is currently registering or logging in.
     private var isRegisterMode = false
 
     companion object {
         private const val TAG = "PocketPathAuth"
-        private const val PREFERENCES_NAME = "pocketpath_preferences"
-        private const val KEY_USER_ID = "logged_in_user_id"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        /*
-         * Open the dashboard immediately when a saved login session exists.
-         * The user will only return to this screen after logging out.
-         */
-        if (isUserLoggedIn()) {
+        if (FirebaseRepository.currentUserId != null) {
             Log.d(TAG, "Existing login session found")
             openDashboard()
             return
@@ -67,23 +50,19 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
-        // Retrieve the shared Room database instance.
-        database = PocketPathDatabase.getDatabase(this)
-
         connectViews()
         configureButtons()
         updateAuthMode()
     }
 
-    /**
-     * Connects the Kotlin variables to the controls in activity_main.xml.
-     */
     private fun connectViews() {
         usernameLayout = findViewById(R.id.usernameLayout)
+        emailLayout = findViewById(R.id.emailLayout)
         passwordLayout = findViewById(R.id.passwordLayout)
         confirmPasswordLayout = findViewById(R.id.confirmPasswordLayout)
 
         etUsername = findViewById(R.id.etUsername)
+        etEmail = findViewById(R.id.etEmail)
         etPassword = findViewById(R.id.etPassword)
         etConfirmPassword = findViewById(R.id.etConfirmPassword)
 
@@ -94,9 +73,6 @@ class MainActivity : AppCompatActivity() {
         btnSwitchAuthMode = findViewById(R.id.btnSwitchAuthMode)
     }
 
-    /**
-     * Configures the main authentication button and the mode-switch button.
-     */
     private fun configureButtons() {
         btnPrimaryAction.setOnClickListener {
             clearErrors()
@@ -114,151 +90,97 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * Updates the screen controls when switching between login and registration.
-     */
     private fun updateAuthMode() {
         if (isRegisterMode) {
             tvAuthTitle.text = "Create account"
             tvAuthSubtitle.text = "Register to begin your financial journey"
+            usernameLayout.hint = "Username"
+            emailLayout.visibility = View.VISIBLE
             confirmPasswordLayout.visibility = View.VISIBLE
             btnPrimaryAction.text = "Register"
             btnSwitchAuthMode.text = "Already have an account? Log in"
         } else {
             tvAuthTitle.text = "Welcome back"
             tvAuthSubtitle.text = "Log in to continue to your dashboard"
+            usernameLayout.hint = "Username or email"
+            emailLayout.visibility = View.GONE
             confirmPasswordLayout.visibility = View.GONE
             btnPrimaryAction.text = "Log in"
             btnSwitchAuthMode.text = "New to PocketPath? Create an account"
+            etEmail.text?.clear()
             etConfirmPassword.text?.clear()
         }
 
-        // Remove validation messages left over from the previous mode.
         clearErrors()
     }
 
-    /**
-     * Validates and saves a new user account in the Room database.
-     */
     private fun registerUser() {
         val username = etUsername.text.toString().trim()
+        val email = etEmail.text.toString().trim()
         val password = etPassword.text.toString()
         val confirmPassword = etConfirmPassword.text.toString()
 
-        if (!validateRegistration(username, password, confirmPassword)) {
+        if (!validateRegistration(username, email, password, confirmPassword)) {
             return
         }
 
-        // Database operations run inside a coroutine to avoid blocking the UI.
         lifecycleScope.launch {
             try {
-                val existingUser =
-                    database.userDao().getUserByUsername(username)
+                FirebaseRepository.registerWithUsername(username, email, password)
 
-                // Usernames must be unique.
-                if (existingUser != null) {
-                    usernameLayout.error =
-                        "This username is already registered"
-                    return@launch
-                }
+                Log.d(TAG, "User registered successfully")
 
-                val userId = database.userDao().insertUser(
-                    User(
-                        username = username,
-                        password = password
-                    )
-                )
+                Toast.makeText(this@MainActivity, "Account created successfully", Toast.LENGTH_SHORT).show()
 
-                Log.d(
-                    TAG,
-                    "User registered successfully with ID: $userId"
-                )
-
-                Toast.makeText(
-                    this@MainActivity,
-                    "Account created successfully",
-                    Toast.LENGTH_SHORT
-                ).show()
-
-                saveLoggedInUser(userId)
                 openDashboard()
             } catch (exception: Exception) {
                 Log.e(TAG, "Registration failed", exception)
 
-                Toast.makeText(
-                    this@MainActivity,
-                    "Unable to create account",
-                    Toast.LENGTH_SHORT
-                ).show()
+                usernameLayout.error = exception.message ?: "Unable to create account"
             }
         }
     }
 
-    /**
-     * Checks the entered details against the users stored in RoomDB.
-     */
     private fun loginUser() {
-        val username = etUsername.text.toString().trim()
+        val rawInput = etUsername.text.toString().trim()
         val password = etPassword.text.toString()
 
-        if (!validateLogin(username, password)) {
+        if (!validateLogin(rawInput, password)) {
             return
         }
 
         lifecycleScope.launch {
             try {
-                val user = database.userDao().login(
-                    username,
-                    password
-                )
+                val resolvedEmail = FirebaseRepository.resolveEmailForLogin(rawInput)
+                FirebaseRepository.login(resolvedEmail, password)
 
-                if (user == null) {
-                    passwordLayout.error =
-                        "Incorrect username or password"
+                Log.d(TAG, "User logged in successfully")
 
-                    Log.w(
-                        TAG,
-                        "Failed login attempt for username: $username"
-                    )
-
-                    return@launch
-                }
-
-                Log.d(
-                    TAG,
-                    "User logged in successfully with ID: ${user.userId}"
-                )
-
-                saveLoggedInUser(user.userId)
                 openDashboard()
             } catch (exception: Exception) {
-                Log.e(TAG, "Login failed", exception)
+                Log.w(TAG, "Failed login attempt for: $rawInput", exception)
 
-                Toast.makeText(
-                    this@MainActivity,
-                    "Unable to log in",
-                    Toast.LENGTH_SHORT
-                ).show()
+                passwordLayout.error = "Incorrect username/email or password"
             }
         }
     }
 
-    /**
-     * Ensures that all registration fields contain acceptable information.
-     */
-    private fun validateRegistration(
-        username: String,
-        password: String,
-        confirmPassword: String
-    ): Boolean {
+    private fun validateRegistration(username: String, email: String, password: String, confirmPassword: String): Boolean {
         var isValid = true
 
         if (username.isBlank()) {
             usernameLayout.error = "Username is required"
             isValid = false
         } else if (username.length < 3) {
-            usernameLayout.error =
-                "Username must contain at least 3 characters"
+            usernameLayout.error = "Username must contain at least 3 characters"
+            isValid = false
+        }
+
+        if (email.isBlank()) {
+            emailLayout.error = "Email is required"
+            isValid = false
+        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            emailLayout.error = "Enter a valid email address"
             isValid = false
         }
 
@@ -266,35 +188,26 @@ class MainActivity : AppCompatActivity() {
             passwordLayout.error = "Password is required"
             isValid = false
         } else if (password.length < 6) {
-            passwordLayout.error =
-                "Password must contain at least 6 characters"
+            passwordLayout.error = "Password must contain at least 6 characters"
             isValid = false
         }
 
         if (confirmPassword.isBlank()) {
-            confirmPasswordLayout.error =
-                "Please confirm your password"
+            confirmPasswordLayout.error = "Please confirm your password"
             isValid = false
         } else if (password != confirmPassword) {
-            confirmPasswordLayout.error =
-                "Passwords do not match"
+            confirmPasswordLayout.error = "Passwords do not match"
             isValid = false
         }
 
         return isValid
     }
 
-    /**
-     * Prevents a login attempt when required fields are empty.
-     */
-    private fun validateLogin(
-        username: String,
-        password: String
-    ): Boolean {
+    private fun validateLogin(input: String, password: String): Boolean {
         var isValid = true
 
-        if (username.isBlank()) {
-            usernameLayout.error = "Username is required"
+        if (input.isBlank()) {
+            usernameLayout.error = "Username or email is required"
             isValid = false
         }
 
@@ -306,49 +219,15 @@ class MainActivity : AppCompatActivity() {
         return isValid
     }
 
-    /**
-     * Clears any previous validation messages from the input fields.
-     */
     private fun clearErrors() {
         usernameLayout.error = null
+        emailLayout.error = null
         passwordLayout.error = null
         confirmPasswordLayout.error = null
     }
 
-    /**
-     * Checks whether an earlier login session is still stored.
-     */
-    private fun isUserLoggedIn(): Boolean {
-        val savedUserId = getSharedPreferences(
-            PREFERENCES_NAME,
-            MODE_PRIVATE
-        ).getLong(KEY_USER_ID, -1L)
-
-        return savedUserId != -1L
-    }
-
-    /**
-     * Stores the active user's ID so the other screens can retrieve
-     * information belonging to the correct user.
-     */
-    private fun saveLoggedInUser(userId: Long) {
-        getSharedPreferences(
-            PREFERENCES_NAME,
-            MODE_PRIVATE
-        ).edit()
-            .putLong(KEY_USER_ID, userId)
-            .apply()
-    }
-
-    /**
-     * Opens the Dashboard after successful registration or login.
-     */
     private fun openDashboard() {
-        val intent = Intent(
-            this,
-            DashboardActivity::class.java
-        )
-
+        val intent = Intent(this, DashboardActivity::class.java)
         startActivity(intent)
         finish()
     }
