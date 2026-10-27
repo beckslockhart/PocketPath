@@ -205,6 +205,37 @@ object FirebaseRepository {
         userDoc(uid).collection("expenses").document(expenseId).delete().await()
     }
 
+    // badges unlocked on the path progress screen saved under users/{uid}/badges
+    // as badge id to the time it was first unlocked
+    fun observeUnlockedBadges(uid: String): Flow<Map<String, Long>> = callbackFlow {
+        val registration = userDoc(uid).collection("badges")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+                val unlocked = snapshot?.documents?.associate { doc ->
+                    doc.id to (doc.getLong("unlockedAt") ?: 0L)
+                } ?: emptyMap()
+                trySend(unlocked)
+            }
+        awaitClose { registration.remove() }
+    }
+
+    // saves several newly unlocked badges in one write so they all land together
+    suspend fun saveUnlockedBadges(uid: String, unlockedAtById: Map<String, Long>) {
+        if (unlockedAtById.isEmpty()) return
+
+        val batch = firestore.batch()
+        unlockedAtById.forEach { (badgeId, unlockedAt) ->
+            batch.set(
+                userDoc(uid).collection("badges").document(badgeId),
+                mapOf("badgeId" to badgeId, "unlockedAt" to unlockedAt)
+            )
+        }
+        batch.commit().await()
+    }
+
     fun observeTotalSpentForPeriod(uid: String, start: Long, end: Long): Flow<Double> = callbackFlow {
         val registration = userDoc(uid).collection("expenses")
             .whereGreaterThanOrEqualTo("expenseDate", start)

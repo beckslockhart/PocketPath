@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- one achievement badge, shown in colour once unlocked and grey with its
+     progress while still locked -->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/badgeCard"
+    android:layout_width="0dp"
+    android:layout_height="match_parent"
+    android:layout_weight="1"
+    android:focusable="true"
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:strokeColor="#D9E6E3"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:padding="14dp">
+
+        <FrameLayout
+            android:layout_width="64dp"
+            android:layout_height="64dp">
+
+            <ImageView
+                android:id="@+id/imgBadgeIcon"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:background="@drawable/bg_circle"
+                android:importantForAccessibility="no"
+                android:padding="15dp"
+                tools:backgroundTint="#EF6C00"
+                tools:src="@drawable/ic_badge_on_a_roll" />
+
+            <!-- small padlock in the corner of a locked badge -->
+            <ImageView
+                android:id="@+id/imgBadgeLock"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="bottom|end"
+                android:background="@drawable/bg_circle"
+                android:backgroundTint="#FFFFFF"
+                android:importantForAccessibility="no"
+                android:padding="4dp"
+                android:src="@drawable/ic_badge_lock"
+                app:tint="#7D908E"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/tvBadgeName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:textColor="#123F43"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            tools:text="On a Roll" />
+
+        <TextView
+            android:id="@+id/tvBadgeHow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:gravity="center"
+            android:textColor="#607372"
+            android:textSize="12sp"
+            tools:text="Log spending 7 days in a row." />
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/progressBadge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            app:indicatorTrackGapSize="0dp"
+            app:trackColor="#E3ECEA"
+            app:trackCornerRadius="3dp"
+            app:trackThickness="6dp"
+            app:trackStopIndicatorSize="0dp"
+            tools:indicatorColor="#A9B8B6"
+            tools:max="7"
+            tools:progress="3" />
+
+        <TextView
+            android:id="@+id/tvBadgeStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:gravity="center"
+            android:textColor="#607372"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            tools:text="3 / 7" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

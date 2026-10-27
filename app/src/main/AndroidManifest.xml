@@ -8,6 +8,9 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- lets Path Progress check for a connection before reading from firebase -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -66,6 +69,11 @@
             android:name=".CategoriesActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
+        <!-- Path Progress score and achievement badges, opened from the dashboard. -->
+        <activity
+            android:name=".PathProgressActivity"
+            android:exported="false" />
 
         <!-- Allows the user to configure monthly spending goals. -->
         <activity

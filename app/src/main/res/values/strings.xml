@@ -58,4 +58,127 @@
     <string name="goal_summary_below">%1$s spent, which is below the %2$s minimum goal</string>
     <string name="goal_summary_within">%1$s spent, which is between the monthly goals</string>
     <string name="goal_summary_above">%1$s spent, which is over the %2$s maximum goal</string>
+
+    <!-- path progress screen -->
+    <string name="path_progress_title">Path Progress</string>
+    <string name="path_progress_subtitle">Your budgeting score for this month, and the badges you\'ve earned along the way.</string>
+    <string name="path_progress_loading">Working out your progress…</string>
+    <string name="path_progress_offline_title">You\'re offline</string>
+    <string name="path_progress_offline_message">Path Progress reads your latest expenses from the cloud. Connect to Wi-Fi or mobile data and try again.</string>
+    <string name="path_progress_error_title">Couldn\'t load your progress</string>
+    <string name="path_progress_error_message">Something went wrong while reading your data. Check your connection and try again.</string>
+    <string name="path_progress_slow_message">This is taking longer than usual. Check your connection and try again.</string>
+    <string name="try_again">Try again</string>
+
+    <string name="path_score_description">Path score %1$d out of 100</string>
+    <string name="path_score_out_of">out of 100</string>
+    <string name="path_score_month">Your score for %1$s</string>
+    <string name="level_starting_out">Starting Out</string>
+    <string name="level_finding_your_path">Finding Your Path</string>
+    <string name="level_on_the_right_path">On the Right Path</string>
+    <string name="level_path_master">Path Master</string>
+    <plurals name="path_points_to_next_level">
+        <item quantity="one">%1$d point to %2$s</item>
+        <item quantity="other">%1$d points to %2$s</item>
+    </plurals>
+    <string name="path_top_level">Top level reached. Keep it up!</string>
+    <string name="path_streak">🔥 %1$d-day logging streak  ·  best %2$d</string>
+    <string name="path_no_streak">Log an expense today to start a streak</string>
+
+    <string name="score_breakdown_title">What made your score</string>
+    <string name="score_breakdown_subtitle">Four areas, each worth 25 points.</string>
+    <string name="pillar_monthly_goal">Monthly goal</string>
+    <string name="pillar_category_limits">Category limits</string>
+    <string name="pillar_logging_habit">Logging habit</string>
+    <string name="pillar_receipts">Receipt photos</string>
+    <string name="pillar_points">%1$d / %2$d</string>
+    <string name="pillar_status_full" translatable="false">✓</string>
+    <string name="pillar_status_partial" translatable="false">!</string>
+    <string name="pillar_status_none" translatable="false">✕</string>
+    <string name="pillar_description">%1$s, %2$d out of %3$d points. %4$s</string>
+
+    <string name="why_goal_not_set">You haven\'t set a monthly goal yet, so this area can\'t score.</string>
+    <string name="why_goal_within">You\'ve spent %1$s this month, between your %2$s minimum and %3$s maximum.</string>
+    <string name="why_goal_below">You\'ve spent %1$s so far, still under your %2$s minimum.</string>
+    <string name="why_goal_slightly_over">You\'ve spent %1$s, which is %2$s over your %3$s maximum. Staying within 10%% over keeps 10 points.</string>
+    <string name="why_goal_well_over">You\'ve spent %1$s, which is %2$s over your %3$s maximum. That\'s more than 10%% over.</string>
+    <string name="why_no_categories">You haven\'t created any budget categories yet.</string>
+    <string name="why_no_limits">None of your budget categories have a monthly limit yet.</string>
+    <string name="why_no_spending">No expenses logged this month yet.</string>
+    <plurals name="why_all_within_limits">
+        <item quantity="one">Your %1$d category with a limit is within it this month.</item>
+        <item quantity="other">All %1$d categories with a limit are within them this month.</item>
+    </plurals>
+    <string name="why_some_over_limits">%1$d of %2$d categories are within their limit. Over: %3$s.</string>
+    <string name="why_logged_enough">You logged spending on %1$d of the last %2$d days.</string>
+    <string name="why_logged_some">You logged spending on %1$d of the last %2$d days. %3$d days earns full marks.</string>
+    <string name="why_not_logged">Nothing logged in the last %1$d days.</string>
+    <string name="why_receipts_enough">%1$d of this month\'s %2$d expenses have a receipt photo.</string>
+    <string name="why_receipts_some">%1$d of this month\'s %2$d expenses have a receipt photo. Half earns full marks.</string>
+    <plurals name="why_no_receipts">
+        <item quantity="one">This month\'s expense has no receipt photo.</item>
+        <item quantity="other">None of this month\'s %1$d expenses have a receipt photo.</item>
+    </plurals>
+
+    <string name="tips_title">How to improve</string>
+    <string name="tips_all_done">You\'re scoring full marks everywhere. Keep logging to stay on the path!</string>
+    <string name="tip_points">+%1$d pts</string>
+    <string name="tip_set_goal">Set a minimum and maximum monthly goal on the Monthly Goals screen.</string>
+    <string name="tip_cut_back">You\'re %1$s over your maximum this month. Hold off on non-essential spending until next month, or check that your maximum is realistic.</string>
+    <string name="tip_check_minimum">You\'re %1$s under your minimum so far. If you\'ve spent more than that, make sure every expense is logged.</string>
+    <string name="tip_add_limits">Give your budget categories a monthly limit so this area can score.</string>
+    <string name="tip_create_categories">Create budget categories with a monthly limit, like Groceries or Transport.</string>
+    <string name="tip_category_over">%1$s is %2$s over its %3$s limit. Go easy on it for the rest of the month, or raise the limit if it was set too low.</string>
+    <string name="tip_start_logging">Log this month\'s expenses so every area of your score can count.</string>
+    <plurals name="tip_log_more_days">
+        <item quantity="one">Log spending on %1$d more day to reach %2$d of the last %3$d. A quick entry each day builds the habit.</item>
+        <item quantity="other">Log spending on %1$d more days to reach %2$d of the last %3$d. A quick entry each day builds the habit.</item>
+    </plurals>
+    <plurals name="tip_add_receipts">
+        <item quantity="one">Add a receipt photo to your next expense to cover half of this month\'s expenses.</item>
+        <item quantity="other">Add a receipt photo to your next %1$d expenses to cover half of this month\'s expenses.</item>
+    </plurals>
+    <string name="tip_category_near">%1$s has only %2$s left of its %3$s limit. Go easy on it.</string>
+    <plurals name="tip_daily_allowance">
+        <item quantity="one">To stay under your maximum, keep today\'s spending below %1$s. It\'s the last day of the month.</item>
+        <item quantity="other">To stay under your maximum, keep spending below %1$s a day for the %2$d days left this month.</item>
+    </plurals>
+
+    <string name="score_explained_title">How your score works</string>
+    <string name="score_explained_body" formatted="false">• Monthly goal (25): full marks between your minimum and maximum, 20 while still under the minimum, 10 if no more than 10% over the maximum.\n• Category limits (25): the share of your limited categories still within their limit this month.\n• Logging habit (25): days with an expense in the last 14 days. 7 days earns full marks.\n• Receipt photos (25): full marks once half of this month\'s expenses have a photo.\n\nLevels: Starting Out 0–39, Finding Your Path 40–69, On the Right Path 70–89, Path Master 90+.</string>
+
+    <!-- achievements -->
+    <string name="achievements_title">Achievements</string>
+    <string name="achievements_count">%1$d of %2$d unlocked</string>
+    <string name="badge_first_step">First Step</string>
+    <string name="badge_first_step_how">Log your first expense.</string>
+    <string name="badge_organiser">Organiser</string>
+    <string name="badge_organiser_how">Create your first budget category.</string>
+    <string name="badge_goal_setter">Goal Setter</string>
+    <string name="badge_goal_setter_how">Set a minimum and maximum monthly goal.</string>
+    <string name="badge_on_a_roll">On a Roll</string>
+    <string name="badge_on_a_roll_how">Log spending 7 days in a row.</string>
+    <string name="badge_receipt_keeper">Receipt Keeper</string>
+    <string name="badge_receipt_keeper_how">Add receipt photos to 10 expenses.</string>
+    <string name="badge_month_mastered">Month Mastered</string>
+    <string name="badge_month_mastered_how">Finish a calendar month without going over your maximum goal.</string>
+    <string name="badge_path_finder">Path Finder</string>
+    <string name="badge_path_finder_how">Reach a Path Progress score of 80 or more.</string>
+    <string name="badge_dedicated_tracker">Dedicated Tracker</string>
+    <string name="badge_dedicated_tracker_how">Log 50 expenses.</string>
+    <string name="badge_unlocked_on">Unlocked %1$s</string>
+    <string name="badge_unlocked">Unlocked</string>
+    <string name="badge_locked">Locked</string>
+    <string name="badge_progress">%1$d / %2$d</string>
+    <string name="badge_description_unlocked">%1$s badge, unlocked. %2$s</string>
+    <string name="badge_description_locked">%1$s badge, locked. %2$s</string>
+    <string name="badge_new_single">🎉 Badge unlocked: %1$s</string>
+    <string name="badge_new_many">🎉 You unlocked %1$d new badges!</string>
+
+    <!-- path progress card on the dashboard -->
+    <string name="dashboard_path_title">Path Progress</string>
+    <string name="dashboard_path_loading">Working out your score…</string>
+    <string name="dashboard_path_summary">%1$s  ·  %2$d of %3$d badges</string>
+    <string name="dashboard_path_action">See your score, tips and badges  →</string>
+    <string name="dashboard_path_unavailable">Tap to see your score and badges</string>
 </resources>

@@ -17,4 +17,45 @@
     <color name="goal_within">#FF2E7D32</color>
     <color name="goal_above">#FFD32F2F</color>
     <color name="goal_marker">#FF16211E</color>
+
+    <!-- app theme, taken from the colours the layouts already use so every
+         material widget, picker and dialog matches instead of showing
+         material's default purple -->
+    <color name="pocket_teal">#FF176B65</color>
+    <color name="pocket_teal_container">#FFD7ECE9</color>
+    <color name="pocket_teal_soft">#FF49A59D</color>
+    <color name="pocket_teal_ripple">#33176B65</color>
+    <color name="pocket_text">#FF173B3F</color>
+    <color name="pocket_text_secondary">#FF607372</color>
+    <color name="pocket_gold_container">#FFFBEBC8</color>
+    <color name="pocket_gold_text">#FF5C4210</color>
+    <color name="pocket_background">#FFF4F8F7</color>
+    <color name="pocket_surface_tint">#FFE8F3F1</color>
+    <color name="pocket_surface_low">#FFF4F8F7</color>
+    <color name="pocket_surface_high">#FFEDF4F2</color>
+    <color name="pocket_outline">#FFB8D1CD</color>
+    <color name="pocket_outline_variant">#FFD9E6E3</color>
+    <color name="pocket_error">#FFC43D3D</color>
+    <color name="pocket_error_container">#FFF6DADA</color>
+    <color name="pocket_inverse_surface">#FF123F43</color>
+    <color name="pocket_inverse_primary">#FF8FD3CB</color>
+
+    <!-- path progress and achievements -->
+    <color name="path_primary">#FF176B65</color>
+    <color name="path_heading">#FF123F43</color>
+    <color name="path_muted">#FF607372</color>
+    <color name="path_gold">#FFF2C66D</color>
+    <color name="path_partial">#FFE08A00</color>
+    <color name="score_ring_track">#40FFFFFF</color>
+    <color name="score_ring_label">#FFD9F1ED</color>
+    <color name="badge_locked_background">#FFF1F4F3</color>
+    <color name="badge_locked_icon">#FFA9B8B6</color>
+    <color name="badge_first_step">#FF176B65</color>
+    <color name="badge_organiser">#FF5C6BC0</color>
+    <color name="badge_goal_setter">#FF1976D2</color>
+    <color name="badge_on_a_roll">#FFEF6C00</color>
+    <color name="badge_receipt_keeper">#FF00897B</color>
+    <color name="badge_month_mastered">#FF2E7D32</color>
+    <color name="badge_path_finder">#FFE0A526</color>
+    <color name="badge_dedicated_tracker">#FF8E24AA</color>
 </resources>

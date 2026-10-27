@@ -1,9 +1,96 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.PocketPath" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    <!-- the app theme in pocketpath's own teal, dark text and gold
+         every layout draws light backgrounds with dark text, so the app keeps
+         this light theme even when the phone is in dark mode, otherwise
+         material swaps in its dark mode purples and the text loses contrast -->
+    <style name="Base.Theme.PocketPath" parent="Theme.Material3.Light.NoActionBar">
+        <!-- teal for buttons, focused text fields, cursors, progress and switches -->
+        <item name="colorPrimary">@color/pocket_teal</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/pocket_teal_container</item>
+        <item name="colorOnPrimaryContainer">@color/pocket_text</item>
+        <item name="colorPrimaryInverse">@color/pocket_inverse_primary</item>
+
+        <item name="colorSecondary">@color/pocket_teal_soft</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorSecondaryContainer">@color/pocket_teal_container</item>
+        <item name="colorOnSecondaryContainer">@color/pocket_text</item>
+
+        <!-- the gold accent from path progress -->
+        <item name="colorTertiary">@color/path_gold</item>
+        <item name="colorOnTertiary">@color/pocket_text</item>
+        <item name="colorTertiaryContainer">@color/pocket_gold_container</item>
+        <item name="colorOnTertiaryContainer">@color/pocket_gold_text</item>
+
+        <item name="colorError">@color/pocket_error</item>
+        <item name="colorOnError">@color/white</item>
+        <item name="colorErrorContainer">@color/pocket_error_container</item>
+        <item name="colorOnErrorContainer">@color/pocket_text</item>
+
+        <!-- white and light teal surfaces for cards, dialogs, menus and the
+             category dropdown instead of material's lavender tinted ones -->
+        <item name="android:colorBackground">@color/pocket_background</item>
+        <item name="colorOnBackground">@color/pocket_text</item>
+        <item name="colorSurface">@color/white</item>
+        <item name="colorOnSurface">@color/pocket_text</item>
+        <item name="colorSurfaceVariant">@color/pocket_surface_tint</item>
+        <item name="colorOnSurfaceVariant">@color/pocket_text_secondary</item>
+        <item name="colorSurfaceContainerLowest">@color/white</item>
+        <item name="colorSurfaceContainerLow">@color/pocket_surface_low</item>
+        <item name="colorSurfaceContainer">@color/white</item>
+        <item name="colorSurfaceContainerHigh">@color/white</item>
+        <item name="colorSurfaceContainerHighest">@color/pocket_surface_high</item>
+        <item name="colorSurfaceInverse">@color/pocket_inverse_surface</item>
+        <item name="colorOnSurfaceInverse">@color/white</item>
+        <item name="colorOutline">@color/pocket_outline</item>
+        <item name="colorOutlineVariant">@color/pocket_outline_variant</item>
+
+        <!-- material 3 tints raised cards with the primary colour, which
+             turned the white cards in the layouts purple and then teal grey,
+             so raised cards keep the exact colour the layout gives them -->
+        <item name="elevationOverlayEnabled">false</item>
+
+        <!-- older appcompat and platform widgets such as the goal seek bar,
+             text selection handles and ripples read these instead -->
+        <item name="colorAccent">@color/pocket_teal</item>
+        <item name="colorControlActivated">@color/pocket_teal</item>
+        <item name="colorControlHighlight">@color/pocket_teal_ripple</item>
+        <item name="android:textColorHighlight">@color/pocket_teal_ripple</item>
+
+        <!-- the date and time pickers and the delete expense dialog are the
+             platform versions so they get their own teal dialog theme -->
+        <item name="android:datePickerDialogTheme">@style/ThemeOverlay.PocketPath.PlatformDialog</item>
+        <item name="android:timePickerDialogTheme">@style/ThemeOverlay.PocketPath.PlatformDialog</item>
+        <item name="android:alertDialogTheme">@style/ThemeOverlay.PocketPath.PlatformAlertDialog</item>
+
+        <!-- dark status bar and navigation icons on the light backgrounds -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="27">true</item>
+
+        <!-- stops phones such as oppo and samsung from darkening the
+             light layouts by themselves in dark mode -->
+        <item name="android:forceDarkAllowed" tools:targetApi="29">false</item>
     </style>
 
     <style name="Theme.PocketPath" parent="Base.Theme.PocketPath" />
+
+    <!-- teal header and buttons for the platform date and time pickers -->
+    <style name="ThemeOverlay.PocketPath.PlatformDialog" parent="android:Theme.Material.Light.Dialog">
+        <item name="android:colorAccent">@color/pocket_teal</item>
+        <item name="android:colorPrimary">@color/pocket_teal</item>
+        <item name="android:colorControlActivated">@color/pocket_teal</item>
+        <item name="android:colorControlHighlight">@color/pocket_teal_ripple</item>
+        <item name="android:textColorPrimary">@color/pocket_text</item>
+        <item name="android:textColorSecondary">@color/pocket_text_secondary</item>
+    </style>
+
+    <!-- teal buttons for platform alert dialogs -->
+    <style name="ThemeOverlay.PocketPath.PlatformAlertDialog" parent="android:Theme.Material.Light.Dialog.Alert">
+        <item name="android:colorAccent">@color/pocket_teal</item>
+        <item name="android:colorPrimary">@color/pocket_teal</item>
+        <item name="android:colorControlHighlight">@color/pocket_teal_ripple</item>
+        <item name="android:textColorPrimary">@color/pocket_text</item>
+        <item name="android:textColorSecondary">@color/pocket_text_secondary</item>
+    </style>
 </resources>

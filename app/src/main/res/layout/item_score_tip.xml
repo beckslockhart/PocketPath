@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- one suggestion for raising the path score and the points it is worth -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:focusable="true"
+    android:orientation="horizontal"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp">
+
+    <TextView
+        android:id="@+id/tvTipNumber"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:background="@drawable/bg_circle"
+        android:backgroundTint="#176B65"
+        android:gravity="center"
+        android:importantForAccessibility="no"
+        android:textColor="#FFFFFF"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        tools:text="1" />
+
+    <TextView
+        android:id="@+id/tvTipText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_weight="1"
+        android:lineSpacingExtra="2dp"
+        android:textColor="#123F43"
+        android:textSize="14sp"
+        tools:text="Add a receipt photo to your next 2 expenses to cover half of this month's expenses." />
+
+    <TextView
+        android:id="@+id/tvTipPoints"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:background="@drawable/bg_points_chip"
+        android:backgroundTint="#FFFFFF"
+        android:paddingStart="8dp"
+        android:paddingTop="3dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="3dp"
+        android:textColor="#176B66"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        tools:text="+12 pts" />
+
+</LinearLayout>

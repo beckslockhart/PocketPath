@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- pocketpath launcher icon for android 7, a rounded square version of the adaptive icon
+     android 8 and newer use the adaptive icon in mipmap-anydpi-v26 instead -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path android:pathData="M4,24a20,20 0,0 1,20 -20h60a20,20 0,0 1,20 20v60a20,20 0,0 1,-20 20h-60a20,20 0,0 1,-20 -20z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:endX="108"
+                android:endY="108"
+                android:startX="0"
+                android:startY="0"
+                android:type="linear">
+                <item
+                    android:color="#FF1E8077"
+                    android:offset="0.0" />
+                <item
+                    android:color="#FF0F4E49"
+                    android:offset="1.0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <group
+        android:pivotX="54"
+        android:pivotY="54"
+        android:scaleX="1.3"
+        android:scaleY="1.3">
+        <!-- the gold coin dropping into the pocket -->
+        <path
+            android:fillColor="#FFF2C66D"
+            android:pathData="M45,31a9,9 0,1 0,18 0a9,9 0,1 0,-18 0z" />
+        <path
+            android:fillColor="#00000000"
+            android:pathData="M48.5,31a5.5,5.5 0,1 0,11 0a5.5,5.5 0,1 0,-11 0z"
+            android:strokeWidth="1.5"
+            android:strokeColor="#FFC9952F" />
+        <!-- the pocket and its opening -->
+        <path
+            android:fillColor="#FFF4F8F7"
+            android:pathData="M30,37H78V60Q78,71 67,76.5L54,83L41,76.5Q30,71 30,60Z" />
+        <path
+            android:fillColor="#FFD9F1ED"
+            android:pathData="M30,37H78V42Q54,48.5 30,42Z" />
+        <!-- the winding path with a gold centre line -->
+        <path
+            android:fillColor="#00000000"
+            android:pathData="M45,75C45,64 63,66.5 63,57.5C63,50.5 50,51.5 50,45.5"
+            android:strokeWidth="6"
+            android:strokeColor="#FF176B65"
+            android:strokeLineCap="round" />
+        <path
+            android:fillColor="#00000000"
+            android:pathData="M45,75C45,64 63,66.5 63,57.5C63,50.5 50,51.5 50,45.5"
+            android:strokeWidth="1.2"
+            android:strokeColor="#FFF2C66D"
+            android:strokeLineCap="round" />
+    </group>
+</vector>

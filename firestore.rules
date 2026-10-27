@@ -1,0 +1,23 @@
+rules_version = '2';
+
+// security rules for the PocketPath firestore database
+// this is a copy of the rules published in the firebase console
+// (firestore database > rules). the app does not deploy them by itself.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // a user's profile and everything under it (categories, expenses,
+    // meta/monthlyGoal and badges) can only be read or changed by that user
+    match /users/{userId}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // the username index is read before signing in to turn a username into
+    // an email, and an entry can only be created for the signed in user
+    match /usernameIndex/{username} {
+      allow read: if true;
+      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
+      allow update, delete: if false;
+    }
+  }
+}

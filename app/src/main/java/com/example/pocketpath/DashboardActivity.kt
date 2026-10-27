@@ -7,12 +7,19 @@ import android.view.Gravity
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.pocketpath.data.firebase.FirebaseRepository
 import com.example.pocketpath.data.firebase.FirebaseRepository.CategoryData
 import com.example.pocketpath.data.firebase.FirebaseRepository.ExpenseData
 import com.example.pocketpath.data.firebase.FirebaseRepository.GoalData
+import com.example.pocketpath.util.Achievements
+import com.example.pocketpath.util.PathScore
+import com.example.pocketpath.view.ScoreRingView
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.card.MaterialCardView
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
@@ -30,12 +37,15 @@ class DashboardActivity : AppCompatActivity() {
     private lateinit var tvMinimumGoal: TextView
     private lateinit var tvMaximumGoal: TextView
     private lateinit var tvRecentExpenses: TextView
+    private lateinit var dashboardScoreRing: ScoreRingView
+    private lateinit var tvDashboardPathSummary: TextView
 
     private var currentUserId: String? = null
 
     companion object {
         private const val TAG = "PocketPathDashboard"
         private const val RECENT_EXPENSE_LIMIT = 5
+        private const val DASHBOARD_RING_TRACK = 0xFFE3ECEA.toInt()
 
         private val DATE_FORMAT = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
     }
@@ -55,6 +65,7 @@ class DashboardActivity : AppCompatActivity() {
         loadUserDetails()
         observeMonthlyOverview()
         observeRecentExpenses()
+        observePathProgress()
         configureButtons()
     }
 
@@ -177,6 +188,57 @@ class DashboardActivity : AppCompatActivity() {
         tvRecentExpenses.text = lines.joinToString("\n\n")
     }
 
+    // a small copy of the path progress score so the screen is easy to find
+    // the rules are the same PathScore and Achievements the full screen uses
+    private fun observePathProgress() {
+        val uid = currentUserId ?: return
+
+        dashboardScoreRing = findViewById(R.id.dashboardScoreRing)
+        tvDashboardPathSummary = findViewById(R.id.tvDashboardPathSummary)
+
+        dashboardScoreRing.setColours(
+            ring = ContextCompat.getColor(this, R.color.path_primary),
+            track = DASHBOARD_RING_TRACK,
+            number = ContextCompat.getColor(this, R.color.path_heading),
+            label = ContextCompat.getColor(this, R.color.path_muted)
+        )
+
+        val savedBadges = FirebaseRepository.observeUnlockedBadges(uid)
+            .catch { exception ->
+                Log.e(TAG, "Unable to read saved badges for the dashboard", exception)
+                emit(emptyMap())
+            }
+
+        lifecycleScope.launch {
+            try {
+                combine(
+                    FirebaseRepository.observeExpenses(uid),
+                    FirebaseRepository.observeCategories(uid),
+                    FirebaseRepository.observeMonthlyGoal(uid),
+                    savedBadges
+                ) { expenses, categories, goal, badges ->
+                    val snapshot = PathProgressActivity.buildSnapshot(expenses, categories, goal)
+                    val now = System.currentTimeMillis()
+                    val result = PathScore.calculate(snapshot, now)
+                    result to Achievements.evaluate(snapshot, result.score, now, badges)
+                }.collectLatest { (result, badges) ->
+                    dashboardScoreRing.setScore(result.score, animate = true)
+                    tvDashboardPathSummary.text = getString(
+                        R.string.dashboard_path_summary,
+                        getString(PathProgressActivity.levelName(result.level)),
+                        badges.count { it.isUnlocked },
+                        badges.size
+                    )
+                }
+            } catch (cancellation: CancellationException) {
+                throw cancellation
+            } catch (exception: Exception) {
+                Log.e(TAG, "Unable to load path progress for the dashboard", exception)
+                tvDashboardPathSummary.setText(R.string.dashboard_path_unavailable)
+            }
+        }
+    }
+
     private fun configureButtons() {
         val btnAddExpense = findViewById<MaterialButton>(R.id.btnAddExpense)
         val btnExpenseHistory = findViewById<MaterialButton>(R.id.btnExpenseHistory)
@@ -198,6 +260,10 @@ class DashboardActivity : AppCompatActivity() {
 
         btnMonthlyGoals.setOnClickListener {
             startActivity(Intent(this, MonthlyGoalsActivity::class.java))
+        }
+
+        findViewById<MaterialCardView>(R.id.cardPathProgress).setOnClickListener {
+            startActivity(Intent(this, PathProgressActivity::class.java))
         }
 
         btnLogout.setOnClickListener {
