@@ -42,4 +42,20 @@
     <string name="photograph_unavailable">This photograph is no longer available on the device.</string>
     <string name="expense_date_time_format">%1$s  ·  %2$s – %3$s</string>
     <string name="unable_to_load_expenses">Unable to load your expense history</string>
+
+    <string name="spending_graph_title">Spending per category</string>
+    <string name="spending_graph_subtitle">Bars show this period. Dashed lines are your monthly goals.</string>
+    <string name="no_spending_graph">No spending to graph for this period.</string>
+    <string name="chart_description">Spending per category: %1$s</string>
+    <string name="chart_empty_description">No spending to graph for this period</string>
+
+    <string name="goal_summary_title">Last 30 days against your goals</string>
+    <string name="goals_not_set">Set a monthly goal to track this</string>
+    <string name="goal_status_below">Below your minimum goal</string>
+    <string name="goal_status_within">On track between your goals</string>
+    <string name="goal_status_above">Over your maximum goal</string>
+    <string name="goal_spent_of_maximum">%1$s spent of %2$s maximum</string>
+    <string name="goal_summary_below">%1$s spent, which is below the %2$s minimum goal</string>
+    <string name="goal_summary_within">%1$s spent, which is between the monthly goals</string>
+    <string name="goal_summary_above">%1$s spent, which is over the %2$s maximum goal</string>
 </resources>

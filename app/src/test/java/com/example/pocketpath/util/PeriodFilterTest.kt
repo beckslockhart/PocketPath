@@ -148,6 +148,52 @@ class PeriodFilterTest {
         )
     }
 
+    @Test
+    fun `the last thirty days includes today`() {
+        val now = dateMillis(2026, 10, 27, hour = 14)
+
+        val period = PeriodFilter.recentDays(30, now)
+
+        assertTrue(period.contains(dateMillis(2026, 10, 27)))
+    }
+
+    @Test
+    fun `the last thirty days reaches back twenty nine days`() {
+        val now = dateMillis(2026, 10, 27, hour = 14)
+
+        val period = PeriodFilter.recentDays(30, now)
+
+        assertTrue(period.contains(dateMillis(2026, 9, 28)))
+    }
+
+    @Test
+    fun `the last thirty days stops before the thirtieth day back`() {
+        val now = dateMillis(2026, 10, 27, hour = 14)
+
+        val period = PeriodFilter.recentDays(30, now)
+
+        assertFalse(period.contains(dateMillis(2026, 9, 27)))
+    }
+
+    @Test
+    fun `a one day window covers only today`() {
+        val now = dateMillis(2026, 10, 27, hour = 14)
+
+        val period = PeriodFilter.recentDays(1, now)
+
+        assertTrue(period.contains(dateMillis(2026, 10, 27)))
+        assertFalse(period.contains(dateMillis(2026, 10, 26)))
+    }
+
+    @Test
+    fun `asking for no days still covers today`() {
+        val now = dateMillis(2026, 10, 27, hour = 14)
+
+        val period = PeriodFilter.recentDays(0, now)
+
+        assertTrue(period.contains(dateMillis(2026, 10, 27)))
+    }
+
     // builds a date to use in the tests
     private fun dateMillis(
         year: Int,

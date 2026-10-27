@@ -2,4 +2,19 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- spending per category graph -->
+    <color name="chart_bar">#FF0E6B5C</color>
+    <color name="chart_bar_empty">#FFD7E2DF</color>
+    <color name="chart_track">#FFEDF1F0</color>
+    <color name="chart_label">#FF16211E</color>
+    <color name="chart_value">#FF4A5C57</color>
+    <color name="chart_goal_minimum">#FF1976D2</color>
+    <color name="chart_goal_maximum">#FFD32F2F</color>
+
+    <!-- monthly goal summary -->
+    <color name="goal_below">#FF1976D2</color>
+    <color name="goal_within">#FF2E7D32</color>
+    <color name="goal_above">#FFD32F2F</color>
+    <color name="goal_marker">#FF16211E</color>
 </resources>

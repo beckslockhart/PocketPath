@@ -52,6 +52,19 @@ object PeriodFilter {
         startOfDay(firstDayMillis) <= startOfDay(lastDayMillis)
 
     // makes a calendar set to the given time
+    // the last whole days up to and including today
+    // used by the goal summary which always looks at the past month no
+    // matter which period the user picked for the graph
+    fun recentDays(days: Int, nowMillis: Long = System.currentTimeMillis()): Period {
+        val safeDays = days.coerceAtLeast(1)
+
+        val firstDay = calendarAt(nowMillis).apply {
+            add(Calendar.DAY_OF_MONTH, -(safeDays - 1))
+        }.timeInMillis
+
+        return periodBetween(firstDay, nowMillis)
+    }
+
     private fun calendarAt(timeMillis: Long): Calendar =
         Calendar.getInstance().apply { this.timeInMillis = timeMillis }
 }
