@@ -1,78 +1,277 @@
 # PocketPath
 
-An offline budget tracker for Android. PocketPath lets a user record what they
-spend, group it into budget categories, set monthly spending goals, and look
-back over any period to see where the money actually went.
+PocketPath is an Android budgeting application designed to help users record income and expenses, organise spending into categories, set monthly financial goals and monitor their budgeting progress.
 
-Everything is stored locally on the device with Room, so the app works with no
-network connection and no account beyond the local login.
+The application was developed in Kotlin using Android Studio. It combines local Android functionality with Firebase online storage so that financial information can be stored and accessed through an online database.
 
 ---
 
-## Features
+## Main Features
 
-| Feature | Where it lives |
-|---|---|
-| Register and log in with a username and password | `MainActivity` |
-| Dashboard showing the month's spending against your goals | `DashboardActivity` |
-| Your five most recent expenses, shown on the dashboard | `DashboardActivity` |
-| Create, edit and delete budget categories with a monthly limit | `CategoriesActivity` |
-| Set a minimum and maximum monthly spending goal, either by typing an amount or by dragging a `SeekBar` | `MonthlyGoalsActivity` |
-| Record an expense with date, start and end times, description, category and an optional photograph | `AddExpensesActivity` |
-| List every expense in a period you choose | `ExpenseHistoryActivity` |
-| See the total spent in each category over that same period | `ExpenseHistoryActivity` |
-| Delete an expense you no longer want | `ExpenseHistoryActivity` |
-| Open an expense photograph full screen from the history list | `PhotoViewerActivity` |
-
-### Choosing a period
-
-The expense history screen opens on the current calendar month. Tapping either
-date field opens a picker, and the list, the per category totals and the period
-total all update together.
-
-A period always covers whole days at both ends. Expenses are stored at midnight
-on the day they happened, so an end bound taken from the current time of day
-would silently hide anything recorded on the closing day of the period. Picking
-an end date earlier than the start date is reported on the field rather than
-quietly showing an empty list.
-
-### Photographs
-
-Photographs are captured through the camera into the app's own private storage
-and shared with the camera app through a `FileProvider`. Only the URI is kept in
-the database. Because the files live inside the app's own directory, no storage
-permission is required to read them back.
-
-Photographs are decoded scaled down to the size they are actually drawn at, so
-a multi megapixel camera image does not stutter the history list while it
-scrolls. If a photograph's file has been removed from the device since the
-expense was saved, the viewer says so instead of showing an empty screen.
+- User registration and login
+- Persistent login sessions
+- Dashboard containing a monthly financial overview
+- Recording of both income and expenses
+- Custom budget categories with monthly limits
+- Minimum and maximum monthly spending goals
+- Transaction history for a user-selected period
+- Total spending per category during the selected period
+- Graphical spending summaries
+- Monthly goal-performance visualisation
+- Optional photograph, PNG or PDF attachments
+- Path Progress score
+- Achievement badges
+- Firebase online data storage
+- Input validation and explanatory error messages
+- Logging for important application actions and errors
 
 ---
 
-## Building and running
+## Lecturer Feedback Implemented
 
-**Requirements**
+The final application incorporates feedback received after the previous development phase.
 
-- Android Studio (the version bundled with JDK 21 or newer)
-- Android SDK platform 37
-- A device or emulator running Android 7.0 (API 24) or newer
+### Persistent login
 
-**Steps**
+A user’s login session is retained after the application is closed. The user is taken directly to the dashboard when reopening PocketPath unless they previously logged out.
 
-1. Clone the repository:
+### Income and expenses
 
-   ```bash
-   git clone https://github.com/beckslockhart/PocketPath.git
-   ```
+The transaction system supports both incoming and outgoing transactions, allowing PocketPath to provide a more complete view of the user’s finances.
 
-2. Open the folder in Android Studio and let Gradle sync. Android Studio writes
-   the `local.properties` file pointing at your SDK; it is deliberately not
-   committed, because that path differs on every machine.
+### Numerical monthly-goal inputs
 
-3. Run the `app` configuration on a device or emulator.
+The original SeekBars were removed from the Monthly Goals screen. Users now enter exact numerical minimum and maximum amounts, providing greater accuracy and making larger amounts easier to set.
 
-From the command line:
+### Category totals
+
+The Expense History screen displays the total amount spent in every category during the period selected by the user.
+
+### Additional attachment types
+
+Transactions can include supported attachments such as photographs, PNG images and PDF documents.
+
+### Consistent interface
+
+The login, dashboard, categories, goals and history screens use a consistent PocketPath colour palette, typography, cards, buttons and input controls.
+
+---
+
+## Original Features
+
+Two features originating from PocketPath’s planning and design phase were implemented to distinguish the application from a basic expense tracker.
+
+### Path Progress
+
+Path Progress evaluates the user’s recent budgeting behaviour. It considers information such as recorded transactions, category limits and progress towards financial goals.
+
+The feature provides a clear progress score and feedback to help the user understand their current budgeting habits.
+
+### Achievement Badges
+
+PocketPath awards achievement badges when users complete positive financial actions. Examples include recording transactions consistently, remaining within category limits and reaching a financial goal.
+
+Unlocked achievements give users additional motivation to continue building healthy financial habits.
+
+---
+
+## Dashboard
+
+The dashboard provides an overview of the logged-in user’s finances. Depending on the available data, it displays:
+
+- Total income
+- Total expenditure
+- Current balance
+- Minimum and maximum monthly goals
+- Monthly goal progress
+- Recent transactions
+- Navigation to the application’s main features
+
+Dashboard information updates when the user adds or changes financial data.
+
+---
+
+## Transactions
+
+Users can record transactions with information such as:
+
+- Transaction type
+- Amount
+- Description
+- Category
+- Date
+- Start time
+- End time
+- Optional attachment
+
+Input is validated before a transaction is saved. Invalid or missing values produce an explanatory error message instead of causing the application to crash.
+
+---
+
+## Budget Categories
+
+Users can create, edit and delete budget categories. Each category contains:
+
+- A category name
+- A monthly spending limit
+- The amount spent in the category
+- The remaining or exceeded amount
+- A visual progress indicator
+
+Category progress uses colour to communicate the user’s position relative to the monthly limit.
+
+---
+
+## Monthly Goals
+
+Users can enter an exact minimum and maximum monthly goal using numerical fields.
+
+PocketPath validates that:
+
+- Both amounts are valid numbers
+- Both amounts are greater than zero
+- The minimum amount is not greater than the maximum amount
+
+Saved goals are displayed on the dashboard and included in the application’s financial-progress visualisations.
+
+---
+
+## Expense History and Period Filtering
+
+The Expense History screen opens on the current calendar month. Users can select a different starting and ending date using the date controls.
+
+Changing the selected period updates:
+
+- The transaction list
+- The total for the selected period
+- Spending totals for every category
+- Related spending visualisations
+
+The application prevents the user from selecting an ending date before the starting date.
+
+---
+
+## Spending Graphs and Goal Visualisation
+
+PocketPath presents financial information visually to make spending patterns easier to understand.
+
+The application includes:
+
+- Spending totals grouped by category
+- A graph for the user-selected period
+- A visual comparison between monthly spending and the user’s minimum and maximum goals
+- Clear indicators showing whether the user is below, within or above the desired range
+
+---
+
+## Attachments
+
+A transaction can optionally include a supported attachment.
+
+Supported formats include:
+
+- Camera photographs
+- PNG image files
+- PDF documents
+
+Only the stored attachment reference is associated with the transaction. If an attachment is unavailable, PocketPath displays an appropriate message rather than crashing.
+
+---
+
+## Online Data Storage
+
+PocketPath uses Firebase to provide online data storage. The Android application is registered with the PocketPath Firebase project through:
+
+```text
+app/google-services.json
+```
+
+Firebase allows application data to be stored online and demonstrated through the Firebase Console.
+
+Room may also be used for supported local application data and offline Android persistence.
+
+---
+
+## Technology
+
+PocketPath uses:
+
+- Kotlin
+- Android Studio
+- XML layouts
+- Material Components
+- Firebase
+- Room Database
+- Kotlin coroutines
+- Kotlin Flow
+- RecyclerView
+- ListAdapter and DiffUtil
+- Gradle
+- Git and GitHub
+- GitHub Actions
+- JUnit automated testing
+
+---
+
+## Project Structure
+
+```text
+app/src/main/java/com/example/pocketpath/
+├── MainActivity.kt
+├── DashboardActivity.kt
+├── CategoriesActivity.kt
+├── MonthlyGoalsActivity.kt
+├── AddExpensesActivity.kt
+├── ExpenseHistoryActivity.kt
+├── ExpenseAdapter.kt
+├── PhotoViewerActivity.kt
+├── data/
+│   ├── entity/
+│   ├── dao/
+│   └── database/
+└── util/
+```
+
+Additional activities, adapters, Firebase classes and feature-specific files may be contained within the same package structure.
+
+---
+
+## Building and Running
+
+### Requirements
+
+- Android Studio
+- JDK 21 or newer
+- Android SDK platform required by the project
+- Android device running Android 7.0/API 24 or newer
+- Internet access for Firebase features
+
+### Clone the repository
+
+```bash
+git clone https://github.com/beckslockhart/PocketPath.git
+```
+
+### Run the application
+
+1. Open the cloned project in Android Studio.
+2. Allow Gradle to finish syncing.
+3. Confirm that `google-services.json` is inside the `app` folder.
+4. Connect a physical Android device or start an emulator.
+5. Select the `app` run configuration.
+6. Click **Run**.
+
+The final demonstration should be performed on a physical Android phone as required by the assignment brief.
+
+### Command-line build
+
+On Windows:
+
+```bash
+gradlew.bat assembleDebug
+```
+
+On macOS or Linux:
 
 ```bash
 ./gradlew assembleDebug
@@ -80,108 +279,133 @@ From the command line:
 
 ---
 
-## Testing
+## APK
 
-The automated tests run on the JVM, so they need no emulator and run in CI on
-every push.
+A debug APK can be generated in Android Studio using:
+
+**Build → Generate App Bundles or APKs → Generate APKs**
+
+The generated file is normally located at:
+
+```text
+app/build/outputs/apk/debug/app-debug.apk
+```
+
+The APK should be tested on a physical Android device before submission.
+
+---
+
+## Automated Testing
+
+Run the JVM unit tests with:
+
+### Windows
+
+```bash
+gradlew.bat testDebugUnitTest
+```
+
+### macOS or Linux
 
 ```bash
 ./gradlew testDebugUnitTest
 ```
 
-The suite covers the rules that are easy to get wrong and expensive to catch by
-hand:
+The test suite includes checks for:
 
-| Test class | What it covers |
+| Test class | Purpose |
 |---|---|
-| `PeriodFilterTest` | Period boundaries — that a period includes its whole opening and closing day, spans month ends, handles a leap year February, and rejects an end date before the start date |
-| `CategoryTotalsTest` | Per category totals — ordering by spend, dropping categories with nothing spent, keeping uncategorised spending, and adding up the period total |
-| `MoneyTest` | Rand formatting and rounding, and the share each category makes up of the period total |
-| `BitmapSamplingTest` | The shrink factor used when decoding photographs, including unreadable images |
+| `PeriodFilterTest` | Checks complete period boundaries, month changes, leap years and invalid date ranges |
+| `CategoryTotalsTest` | Checks category ordering, uncategorised spending and period totals |
+| `MoneyTest` | Checks South African rand formatting, rounding and category shares |
+| `BitmapSamplingTest` | Checks image-scaling calculations and unreadable images |
 
-An HTML report is written to
-`app/build/reports/tests/testDebugUnitTest/index.html` after a run, and is also
-uploaded as an artifact by the CI workflow.
+The HTML test report is generated at:
+
+```text
+app/build/reports/tests/testDebugUnitTest/index.html
+```
 
 ---
 
-## Continuous integration
+## Continuous Integration
 
-`.github/workflows/build.yml` runs on every push and pull request to `main`, and
-can also be started by hand from the Actions tab. It:
+The GitHub Actions workflow is stored at:
 
-1. Checks out the repository on a clean Ubuntu runner
-2. Sets up JDK 21 — matching the toolchain pinned in
-   `gradle/gradle-daemon-jvm.properties`
-3. Runs the unit tests
+```text
+.github/workflows/build.yml
+```
+
+The workflow runs when code is pushed or when a pull request is opened for the `main` branch. It:
+
+1. Checks out the repository
+2. Configures the required JDK
+3. Runs the automated tests
 4. Builds the debug APK
-5. Uploads the test report and the APK as downloadable artifacts
+5. Uploads the APK and test report as workflow artifacts
 
-The test report is uploaded even when the tests fail, so a red run can be read
-without reproducing it locally.
+This verifies that PocketPath can build successfully outside the developers’ local computers.
 
 ---
 
-## Project structure
+## Logging and Error Handling
 
-```
-app/src/main/java/com/example/pocketpath/
-├── MainActivity.kt              Login and registration
-├── DashboardActivity.kt         Monthly overview and navigation
-├── CategoriesActivity.kt        Budget categories and limits
-├── MonthlyGoalsActivity.kt      Minimum and maximum monthly goals
-├── AddExpensesActivity.kt       Recording an expense
-├── ExpenseHistoryActivity.kt    Period filtering and category totals
-├── ExpenseAdapter.kt            Expense history list rows
-├── PhotoViewerActivity.kt       Full screen photograph
-├── data/
-│   ├── entity/                  User, Category, Expense, MonthlyGoal
-│   ├── dao/                     Room queries
-│   └── database/                PocketPathDatabase
-└── util/
-    ├── PeriodFilter.kt          Period boundary rules
-    ├── CategoryTotals.kt        Per category totals for a period
-    ├── Money.kt                 Rand formatting
-    ├── PhotoLoader.kt           Reading photographs from the file provider
-    └── BitmapSampling.kt        Photograph shrink factor
-```
+PocketPath uses Android logging to record important events and failures. Database, authentication, Firebase and file-related operations use error handling to reduce crashes and provide understandable feedback.
 
-### Data model
+Logs can be viewed through **Logcat** in Android Studio.
 
-Four Room tables, all scoped to the logged in user:
-
-- **users** — username and password, with a unique index on the username
-- **categories** — name and monthly limit, unique per user
-- **expenses** — amount, description, date, start and end times, optional
-  photograph URI, linked to a user and a category
-- **monthly_goals** — minimum and maximum monthly spend, one row per user
-
-Deleting a user cascades to their data. Deleting a category leaves its expenses
-in place with no category, so spending history is never lost; those expenses
-appear as *Uncategorised* in the totals.
-
-### Technology
-
-- Kotlin
-- Room for local persistence, with KSP
-- Kotlin coroutines and `Flow`, so screens update themselves when data changes
-- Material Components views with XML layouts
-- RecyclerView with `ListAdapter` and `DiffUtil` for the expense history
+Sensitive information such as passwords should not be printed to the log.
 
 ---
 
 ## Team
 
-PocketPath was built as a group project by four students. The work was split as
-follows:
+PocketPath was developed as a four-person group project.
 
-| Member | GitHub | Responsible for |
-|---|---|---|
-| Rebecca Lockhart | `beckslockhart` | Project structure, Room database, navigation, login and registration, and the dashboard |
-| Oliver Mann | `Dxrk-Reality` | Budget categories, monthly minimum and maximum goals, and deleting an expense |
-| Gift Zowa | `ClownBeatz` | Add Expense screen, including date, start and end times, category, description and photograph |
-| Callum Schultz | `Callumschultz` | Expense history, period filtering, category totals, photo viewing, unit tests, README and GitHub Actions |
+| Member | GitHub |
+|---|---|
+| Rebecca Lockhart | `beckslockhart` |
+| Oliver Mann | `Dxrk-Reality` |
+| Gift Zowa | `ClownBeatz` |
+| Callum Schultz | `Callumschultz` |
 
-## Demonstration video
+Development was coordinated through GitHub using regular commits and pushes. Team members contributed to application functionality, interface development, Firebase integration, automated testing, documentation and final testing.
 
-https://youtu.be/6zLeNobCc6E
+---
+
+## Demonstration Video
+
+The final demonstration-video link will be added here after the Part 3 video has been uploaded:
+
+```text
+PART 3 VIDEO LINK TO BE ADDED
+```
+
+The demonstration includes:
+
+- The application running on a physical Android device
+- Registration and login
+- Persistent user sessions
+- Income and expense transactions
+- Budget categories
+- Numerical monthly goals
+- Period filtering and category totals
+- Spending graphs and goal visualisation
+- Firebase online data
+- Attachments
+- Path Progress
+- Achievement badges
+
+---
+
+## Previous Demonstration
+
+The Part 2 demonstration is available at:
+
+https://youtu.be/Ibuf9NRiFfo
+
+---
+
+## Licence and Academic Use
+
+PocketPath was developed as an academic group project. External libraries and technologies used by the application remain subject to their respective licences.
